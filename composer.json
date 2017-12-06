@@ -1,0 +1,50 @@
+{
+    "name": "mmikkel/retcon",
+    "description": "A collection of powerful Twig filters for modifying HTML",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "retcon"
+    ],
+    "support": {
+        "docs": "https://github.com/mmikkel/retcon/blob/master/README.md",
+        "issues": "https://github.com/mmikkel/retcon/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mats Mikkel Rummelhoff",
+            "homepage": "https://vaersaagod.no"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+          "mmikkel\\retcon\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Retcon",
+        "handle": "retcon",
+        "schemaVersion": "1.0.0",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "changelogUrl": "https://raw.githubusercontent.com/mmikkel/retcon/master/CHANGELOG.md",
+        "components": {
+            "retconService": "mmikkel\\retcon\\services\\RetconService"
+        },
+        "class": "mmikkel\\retcon\\Retcon"
+    }
+}
