@@ -16,6 +16,8 @@ use mmikkel\retcon\library\RetconHelper;
 use Craft;
 use craft\base\Component;
 
+use yii\base\Exception;
+
 /**
  * Retcon Service
  *
@@ -36,7 +38,7 @@ class RetconService extends Component
      * @param $html
      * @param $args
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function retcon($html, $args)
     {
@@ -46,7 +48,7 @@ class RetconService extends Component
         }
 
         if (empty($args)) {
-            throw new \Exception(Craft::t('No filter method or callbacks defined'));
+            throw new Exception(Craft::t('retcon', 'No filter method or callbacks defined'));
         }
 
         $calls = is_array($args[0]) ? $args[0] : array($args);
@@ -58,7 +60,7 @@ class RetconService extends Component
             $filter = array_shift($args);
 
             if (!method_exists($this, $filter)) {
-                throw new \Exception(Craft::t('Undefined filter method {filter}', [
+                throw new Exception(Craft::t('retcon', 'Undefined filter method {filter}', [
                     'filter' => $filter,
                 ]));
             }
@@ -93,7 +95,7 @@ class RetconService extends Component
      * @throws \aelvan\imager\exceptions\ImagerException
      * @throws \craft\errors\AssetTransformException
      * @throws \craft\errors\ImageException
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function transform($html, $transform, array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
     {
@@ -166,7 +168,7 @@ class RetconService extends Component
      * @throws \aelvan\imager\exceptions\ImagerException
      * @throws \craft\errors\AssetTransformException
      * @throws \craft\errors\ImageException
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function srcset($html, $transforms, $sizes = '100w', $base64src = false, $transformDefaults = null, $configOverrides = null)
     {
@@ -266,7 +268,7 @@ class RetconService extends Component
      * @param null $className
      * @param null $attributeName
      * @return \Twig_Markup
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function lazy($html, $className = null, $attributeName = null)
     {

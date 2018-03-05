@@ -9,6 +9,7 @@
  */
 
 namespace mmikkel\retcon\variables;
+
 use mmikkel\retcon\library\RetconApi;
 
 /**
@@ -23,7 +24,6 @@ use mmikkel\retcon\library\RetconApi;
  * @package   Retcon
  * @since     1.0.0
  */
-
 class RetconVariable extends RetconApi
 {
 

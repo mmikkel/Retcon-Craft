@@ -11,8 +11,8 @@
         "retcon"
     ],
     "support": {
-        "docs": "https://github.com/mmikkel/retcon/blob/master/README.md",
-        "issues": "https://github.com/mmikkel/retcon/issues"
+        "docs": "https://github.com/mmikkel/Retcon-Craft/blob/master/README.md",
+        "issues": "https://github.com/mmikkel/Retcon-Craft/issues"
     },
     "license": "MIT",
     "authors": [
@@ -41,7 +41,7 @@
         "schemaVersion": "1.0.0",
         "hasCpSettings": false,
         "hasCpSection": false,
-        "changelogUrl": "https://raw.githubusercontent.com/mmikkel/retcon/master/CHANGELOG.md",
+        "changelogUrl": "https://raw.githubusercontent.com/mmikkel/Retcon-Craft/master/CHANGELOG.md",
         "components": {},
         "class": "mmikkel\\retcon\\Retcon"
     }
