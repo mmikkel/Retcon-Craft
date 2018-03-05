@@ -107,6 +107,15 @@ class RetconHelper
 
             if ($useImager && $transform) {
                 $transform = $transform->getAttributes();
+                $transform = [
+                    'width' => $transform['width'] ?? null,
+                    'height' => $transform['height'] ?? null,
+                    'format' => $transform['format'] ?? null,
+                    'mode' => $transform['mode'] ?? null,
+                    'position' => $transform['position'] ?? null,
+                    'interlace' => $transform['interlace'] ?? null,
+                    'quality' => $transform['quality'] ?? null,
+                ];
             }
 
             self::$transforms[$transformName] = $transform;
