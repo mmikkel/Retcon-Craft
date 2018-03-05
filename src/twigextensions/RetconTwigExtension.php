@@ -10,10 +10,6 @@
 
 namespace mmikkel\retcon\twigextensions;
 
-use mmikkel\retcon\Retcon;
-
-use Craft;
-
 /**
  * Twig can be extended in many ways; you can add extra tags, filters, tests, operators,
  * global variables, and functions. You can even extend the parser itself with
@@ -27,13 +23,8 @@ use Craft;
  */
 class RetconTwigExtension extends \Twig_Extension
 {
-    // Public Methods
-    // =========================================================================
-
     /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * @return string
      */
     public function getName()
     {
@@ -41,44 +32,12 @@ class RetconTwigExtension extends \Twig_Extension
     }
 
     /**
-     * Returns an array of Twig filters, used in Twig templates via:
-     *
-     *      {{ 'something' | someFilter }}
-     *
-     * @return array
+     * @return array|\Twig_Filter[]|\Twig_SimpleFilter[]
      */
     public function getFilters()
     {
-        return [
-            new \Twig_SimpleFilter('someFilter', [$this, 'someInternalFunction']),
-        ];
-    }
-
-    /**
-     * Returns an array of Twig functions, used in Twig templates via:
-     *
-     *      {% set this = someFunction('something') %}
-     *
-    * @return array
-     */
-    public function getFunctions()
-    {
-        return [
-            new \Twig_SimpleFunction('someFilter', [$this, 'someInternalFunction']),
-        ];
-    }
-
-    /**
-     * Our function called via Twig; it can do anything you want
-     *
-     * @param null $text
-     *
-     * @return string
-     */
-    public function someInternalFunction($text = null)
-    {
-        $result = $text . " in the way";
-
-        return $result;
+        return array_map(function ($method) {
+            return new \Twig_SimpleFilter('retcon' . ($method != 'retcon' ? ucfirst($method) : ''), array('mmikkel\retcon\library\RetconApi', $method));
+        }, get_class_methods('mmikkel\retcon\library\RetconApi'));
     }
 }

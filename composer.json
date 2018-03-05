@@ -2,7 +2,7 @@
     "name": "mmikkel/retcon",
     "description": "A collection of powerful Twig filters for modifying HTML",
     "type": "craft-plugin",
-    "version": "1.0.0",
+    "version": "1.0.0-beta1",
     "keywords": [
         "craft",
         "cms",
@@ -42,9 +42,7 @@
         "hasCpSettings": false,
         "hasCpSection": false,
         "changelogUrl": "https://raw.githubusercontent.com/mmikkel/retcon/master/CHANGELOG.md",
-        "components": {
-            "retconService": "mmikkel\\retcon\\services\\RetconService"
-        },
+        "components": {},
         "class": "mmikkel\\retcon\\Retcon"
     }
 }
