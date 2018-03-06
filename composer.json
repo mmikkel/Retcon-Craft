@@ -2,7 +2,7 @@
     "name": "mmikkel/retcon",
     "description": "A collection of powerful Twig filters for modifying HTML",
     "type": "craft-plugin",
-    "version": "1.0.0-beta1",
+    "version": "1.0.0",
     "keywords": [
         "craft",
         "cms",
