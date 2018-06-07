@@ -877,14 +877,15 @@ class RetconService extends Component
      * @param $html
      * @param $pattern
      * @param string $replace
+     * @param int $limit
      * @return null|string|string[]
      */
-    public function replace($html, $pattern, $replace = '')
+    public function replace($html, $pattern, $replace = '', $limit = -1)
     {
         if (!$html) {
             return $html;
         }
-        return preg_replace($pattern, $replace, $html);
+        return preg_replace($pattern, $replace, $html, $limit);
     }
 
 }

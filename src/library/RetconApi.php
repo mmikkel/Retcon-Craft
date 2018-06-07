@@ -171,11 +171,12 @@ class RetconApi
      * @param $html
      * @param $pattern
      * @param string $replace
+     * @param int $limit
      * @return null|string|string[]
      */
-    public static function replace($html, $pattern, $replace = '')
+    public static function replace($html, $pattern, $replace = '', $limit = -1)
     {
-        return Retcon::$plugin->retcon->replace($html, $pattern, $replace);
+        return Retcon::$plugin->retcon->replace($html, $pattern, $replace, $limit);
     }
 
 }
