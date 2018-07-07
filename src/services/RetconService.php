@@ -10,12 +10,16 @@
 
 namespace mmikkel\retcon\services;
 
+use mmikkel\retcon\Retcon;
+use mmikkel\retcon\library\RetconCrawler;
 use mmikkel\retcon\library\RetconDom;
 use mmikkel\retcon\library\RetconHelper;
 
 use Craft;
 use craft\base\Component;
+use craft\elements\Asset;
 
+use Symfony\Component\DomCrawler\Crawler;
 use yii\base\Exception;
 
 /**
@@ -35,7 +39,7 @@ class RetconService extends Component
 {
 
     /**
-     * @param $html
+     * @param string $html
      * @param $args
      * @return mixed
      * @throws Exception
@@ -51,21 +55,21 @@ class RetconService extends Component
             throw new Exception(Craft::t('retcon', 'No filter method or callbacks defined'));
         }
 
-        $calls = is_array($args[0]) ? $args[0] : array($args);
+        $operations = \is_array($args[0]) ? $args[0] : [$args];
 
-        foreach ($calls as $call) {
+        foreach ($operations as $operation) {
 
-            $args = is_array($call) ? $call : array($call);
+            $args = \is_array($operation) ? $operation : [$operation];
 
-            $filter = array_shift($args);
+            $filter = \array_shift($args);
 
-            if (!method_exists($this, $filter)) {
+            if (!\method_exists($this, $filter)) {
                 throw new Exception(Craft::t('retcon', 'Undefined filter method {filter}', [
                     'filter' => $filter,
                 ]));
             }
 
-            $html = call_user_func_array(array($this, $filter), array_merge(array($html), $args));
+            $html = \call_user_func_array([$this, $filter], \array_merge([$html], $args));
 
         }
 
@@ -73,41 +77,25 @@ class RetconService extends Component
 
     }
 
-    /*
-    * transform
-    *
-    * Apply an image transform to all images.
-    *
-    * @html String
-    *
-    * @transform Mixed
-    * Named (String) or inline transform (Array)
-    *
-    */
-
-
     /**
-     * @param $html
+     * transform
+     * Applies an image transform to all images (or all nodes matching the passed selector(s))
+     *
+     * @param string $html
      * @param string|array $transform
+     * @param string|array $selector
      * @param array $imagerTransformDefaults
      * @param array $imagerConfigOverrides
      * @return \Twig_Markup
-     * @throws \aelvan\imager\exceptions\ImagerException
      * @throws \craft\errors\AssetTransformException
-     * @throws \craft\errors\ImageException
-     * @throws Exception
      */
-    public function transform($html, $transform, array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
+    public function transform($html, $transform, $selector = 'img', array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
     {
 
-        if (!$html) {
-            return $html;
-        }
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
 
-        $doc = new RetconDom($html);
-        $docImages = $doc->getElementsByTagName('img');
-
-        if (!$docImages) {
+        if (!$nodes) {
             return $html;
         }
 
@@ -117,71 +105,53 @@ class RetconService extends Component
             return $html;
         }
 
-        // Transform images
-        foreach ($docImages as $docImage) {
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
 
-            $src = $docImage->getAttribute('src');
-
-            if (!$src) {
+            if (!$src = $node->getAttribute('src')) {
                 continue;
             }
 
-            $transformedImage = RetconHelper::getTransformedImage($src, $transform, $imagerTransformDefaults, $imagerConfigOverrides);
-
-            if (!$transformedImage) {
-                continue;
+            if (!$transformedImage = RetconHelper::getTransformedImage($src, $transform, $imagerTransformDefaults, $imagerConfigOverrides)) {
+                return;
             }
 
-            $docImage->setAttribute('src', $transformedImage->url);
+            $node->setAttribute('src', $transformedImage->url);
 
-            if ($docImage->getAttribute('width')) {
-                $docImage->setAttribute('width', $transformedImage->width);
+            if ($node->getAttribute('width')) {
+                $node->setAttribute('width', $transformedImage->width);
             }
-            if ($docImage->getAttribute('height')) {
-                $docImage->setAttribute('height', $transformedImage->height);
+
+            if ($node->getAttribute('height')) {
+                $node->setAttribute('height', $transformedImage->height);
             }
 
         }
 
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * srcset
-    *
-    *
-    * @html String
-    *
-    * @transform Mixed
-    * Named (String) or inline transform (Array)
-    *
-    */
     /**
-     * @param $html
-     * @param $transforms
+     * srcset
+     * Creates a srcset attribute for all images (or all nodes matching the selector(s) passed) with the proper transforms
+     *
+     * @param string $html
+     * @param string|array $transforms
+     * @param string|array $selector
      * @param string $sizes
      * @param bool $base64src
-     * @param null $transformDefaults
-     * @param null $configOverrides
+     * @param array $transformDefaults
+     * @param array $configOverrides
      * @return \Twig_Markup
-     * @throws \aelvan\imager\exceptions\ImagerException
-     * @throws \craft\errors\AssetTransformException
-     * @throws \craft\errors\ImageException
-     * @throws Exception
      */
-    public function srcset($html, $transforms, $sizes = '100w', $base64src = false, $transformDefaults = null, $configOverrides = null)
+    public function srcset($html, $transforms, $selector = 'img', $sizes = '100w', $base64src = false, $transformDefaults = [], $configOverrides = [])
     {
 
-        if (!$html) {
-            return $html;
-        }
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
 
-        // Get images
-        $doc = new RetconDom($html);
-        $docImages = $doc->getElementsByTagName('img');
-
-        if (!$docImages) {
+        if (!$nodes) {
             return $html;
         }
 
@@ -190,702 +160,484 @@ class RetconService extends Component
             $transforms = [$transforms];
         }
 
-        $temp = [];
-        foreach ($transforms as $transform) {
+        $transforms = \array_reduce($transforms, function ($carry, $transform) {
             $transform = RetconHelper::getImageTransform($transform);
             if ($transform) {
-                $temp[] = $transform;
+                $carry[] = $transform;
             }
-        }
-        if (empty($temp)) {
+            return $carry;
+        }, []);
+
+        if (empty($transforms)) {
             return $html;
         }
-        $transforms = $temp;
 
         // Get sizes attribute
         if ($sizes) {
             $sizes = !\is_array($sizes) ? [$sizes] : $sizes;
         }
 
-        // Add srcset attribute to images
-        foreach ($docImages as $docImage) {
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
 
-            $imageUrl = Craft::$app->getElements()->parseRefs($docImage->getAttribute('src'));
-
-            if (!$imageUrl) {
+            if (!$src = $node->getAttribute('src')) {
                 continue;
             }
 
             // Get transformed images
-            $transformedImages = [];
-            foreach ($transforms as $transform) {
-                $transformedImage = RetconHelper::getTransformedImage($imageUrl, $transform, $transformDefaults, $configOverrides);
-                if ($transformedImage) {
-                    $transformedImages[] = $transformedImage;
+            $transformedImages = \array_reduce($transforms, function ($carry, $transform) use ($src, $transformDefaults, $configOverrides) {
+                if ($transformedImage = RetconHelper::getTransformedImage($src, $transform, $transformDefaults, $configOverrides)) {
+                    $carry[] = $transformedImage;
                 }
-            }
+                return $carry;
+            }, []);
+
             if (empty($transformedImages)) {
                 continue;
             }
 
             // Add srcset attribute
-            $docImage->setAttribute('srcset', RetconHelper::getSrcsetAttribute($transformedImages));
+            $node->setAttribute('srcset', RetconHelper::getSrcsetAttribute($transformedImages));
 
             // Add sizes attribute
             if ($sizes) {
-                $docImage->setAttribute('sizes', implode(', ', $sizes));
+                $node->setAttribute('sizes', \implode(', ', $sizes));
             }
 
-            // Swap out the src for a base64 encoded SVG
-            if ($base64src) {
-                $dimensions = RetconHelper::getImageDimensions($docImage);
-                $width = $dimensions ? $dimensions['width'] : null;
-                $height = $dimensions ? $dimensions['height'] : null;
-                $docImage->setAttribute('src', RetconHelper::getBase64Pixel($width, $height));
+            $node->setAttribute('src', RetconHelper::parseRef($src));
+
+            // Swap out the src for a base64 encoded SVG?
+            if (!$base64src) {
+                continue;
             }
 
-        }
-
-        return $doc->getHtml();
-
-    }
-
-    /*
-    * lazy
-    *
-    * Replaces the src attribute with a base64 encoded, transparent SVG
-    * The original source will be retained in a data attribute
-    *
-    * @className String
-    * Class for lazy images (optional, default "lazy")
-    *
-    * @attributeName String
-    * Name of data attribute for original source (optional, default "original")
-    *
-    */
-    /**
-     * @param $html
-     * @param null $className
-     * @param null $attributeName
-     * @return \Twig_Markup
-     * @throws Exception
-     */
-    public function lazy($html, $className = null, $attributeName = null)
-    {
-
-        if (!$html) {
-            return $html;
-        }
-
-        $doc = new RetconDom($html);
-
-        if (!$docImages = $doc->getElementsByTagName('img')) {
-            return $html;
-        }
-
-        $attributeName = 'data-' . ($attributeName ?: 'original');
-        $className = $className ?: 'lazy';
-
-        foreach ($docImages as $docImage) {
-            $imageClasses = \explode(' ', $docImage->getAttribute('class'));
-            $imageClasses[] = $className;
-            $dimensions = RetconHelper::getImageDimensions($docImage);
+            $dimensions = RetconHelper::getImageDimensions($node);
             $width = $dimensions ? $dimensions['width'] : null;
             $height = $dimensions ? $dimensions['height'] : null;
-            $docImage->setAttribute('class', \trim(\implode(' ', $imageClasses)));
-            $docImage->setAttribute($attributeName, $docImage->getAttribute('src'));
-            $docImage->setAttribute('src', RetconHelper::getBase64Pixel($width, $height));
-            $docImage->setAttribute('width', $width);
-            $docImage->setAttribute('height', $height);
+            $node->setAttribute('src', RetconHelper::getBase64Pixel($width, $height));
         }
 
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * autoAlt
-    *
-    * Adds filename as alt attribute for images missing alternative text. Optionally overwrite alt attribute for all images
-    *
-    * @overwrite Boolean
-    * Overwrite existing alt attributes (optional, default false)
-    *
-    */
     /**
-     * @param $html
-     * @param bool $overwrite
+     * lazy
+     * Prepares all images (or all nodes matching the selector(s) passed) by swapping out the `src` attribute with a base64 encoded, transparent SVG. The original source will be retained in a data attribute
+     *
+     * @param string $html
+     * @param string|array $selector
+     * @param string $className
+     * @param string $attributeName
      * @return \Twig_Markup
      */
-    public function autoAlt($html, $overwrite = false)
+    public function lazy($html, $selector = 'img', $className = 'lazyload', $attributeName = 'src')
     {
 
-        if (!$html) {
-            return $html;
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
+        $attributeName = "data-{$attributeName}";
+
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
+
+            $imageClasses = \explode(' ', $node->getAttribute('class'));
+            $imageClasses[] = $className;
+
+            $dimensions = RetconHelper::getImageDimensions($node);
+
+            $width = $dimensions ? $dimensions['width'] : null;
+            $height = $dimensions ? $dimensions['height'] : null;
+
+            $node->setAttribute('class', \trim(\implode(' ', $imageClasses)));
+            $node->setAttribute($attributeName, RetconHelper::parseRef($node->getAttribute('src')));
+            $node->setAttribute('src', RetconHelper::getBase64Pixel($width, $height));
+            $node->setAttribute('width', $width);
+            $node->setAttribute('height', $height);
         }
 
-        $doc = new RetconDom($html);
-
-        if (!$docImages = $doc->getElementsByTagName('img')) {
-            return $html;
-        }
-
-        foreach ($docImages as $docImage) {
-
-            $alt = $docImage->getAttribute('alt');
-
-            if (!$alt || strlen($alt) === 0) {
-                $imageSource = $docImage->getAttribute('src');
-                $imageSourcePathinfo = \pathinfo($imageSource);
-                $docImage->setAttribute('alt', $imageSourcePathinfo['filename']);
-            }
-
-        }
-
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * attr
-    *
-    * Adds or replaces one or many attributes for one or many selectors
-    *
-    * @selectors Mixed
-    * String or Array of strings
-    *
-    * @attributes Array
-    * Associative array of attribute names and values
-    *
-    * @overwrite Boolean
-    * Overwrites existing attribute values (optional, true)
-    *
-    */
     /**
-     * @param $html
-     * @param $selectors
-     * @param $attributes
+     * autoAlt
+     * Attempts to auto-generate alternative text for all images (or all elements matching the $selector attribute).
+     *
+     * @param string $html
+     * @param string|array $selector
+     * @param string $field
      * @param bool $overwrite
      * @return \Twig_Markup
      */
-    public function attr($html, $selectors, $attributes, $overwrite = true)
+    public function autoAlt($html, $selector = 'img', $field = 'title', $overwrite = false)
     {
 
-        if (!$html) {
-            return $html;
-        }
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
 
-        $selectors = is_array($selectors) ? $selectors : [$selectors];
-
-        $doc = new RetconDom($html);
-
-        foreach ($selectors as $selector) {
-
-            // Get all matching selectors, and add/replace attributes
-            if (!$elements = $doc->getElementsBySelector($selector)) {
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
+            if (!$src = $node->getAttribute('src')) {
                 continue;
             }
+            if ($overwrite || !$alt = $node->getAttribute('alt')) {
+                $alt = null;
+                $elementId = RetconHelper::getElementIdFromRef($src);
+                $element = $elementId ? Craft::$app->getElements()->getElementById($elementId) : null;
+                if ($element) {
+                    $alt = @$element->$field ?: null;
+                }
+                if (!$alt) {
+                    $imageSourcePathinfo = \pathinfo($src);
+                    $alt = $imageSourcePathinfo['filename'] ?? '';
+                }
+                $node->setAttribute('alt', $alt);
+            }
+        }
 
-            foreach ($elements as $element) {
+        return $dom->getHtml();
 
-                foreach ($attributes as $key => $value) {
+    }
 
-                    // Add or remove?
-                    if (!$value) {
+    /**
+     * attr
+     * Adds (to) or replaces one or many attributes for one or many selectors
+     *
+     * @param string $html
+     * @param string|array $selector
+     * @param array $attributes
+     * @param bool $overwrite
+     * @return \Twig_Markup
+     */
+    public function attr($html, $selector, $attributes, $overwrite = true)
+    {
 
-                        $element->removeAttribute($key);
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
 
-                    } else if ($value === true) {
-
-                        $element->setAttribute($key, '');
-
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
+            foreach ($attributes as $key => $value) {
+                if (!$value) {
+                    // Falsey value, remove attribute
+                    $node->removeAttribute($key);
+                } else if ($value === true) {
+                    // For true, just add an empty attribute
+                    $node->setAttribute($key, '');
+                } else {
+                    // Add attribute, either overwriting/replacing the old attribute values or just appending to it
+                    if (!$overwrite && $key !== 'id') {
+                        $attributeValues = \explode(' ', $node->getAttribute($key));
+                        $attributeValues[] = $value;
                     } else {
-
-                        if (!$overwrite && $key !== 'id') {
-                            $attributeValues = \explode(' ', $element->getAttribute($key));
-                            if (!\in_array($value, $attributeValues)) {
-                                $attributeValues[] = $value;
-                            }
-                        } else {
-                            $attributeValues = array($value);
-                        }
-
-                        $element->setAttribute($key, \trim(\implode(' ', $attributeValues)));
+                        $attributeValues = [$value];
                     }
-
+                    $node->setAttribute($key, \trim(\implode(' ', \array_unique(\array_filter($attributeValues)))));
                 }
-
             }
-
         }
 
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * renameAttr
-    *
-    * Renames attributes for matching selectors
-    *
-    * @selectors Mixed
-    * String or Array of strings
-    *
-    * @attributes Array
-    * Associative array of attribute names and desired names
-    *
-    *
-    */
     /**
-     * @param $html
-     * @param $selectors
-     * @param $attributes
+     * renameAttr
+     * Renames attributes for matching selector(s)
+     *
+     * @param string $html
+     * @param string|array $selector
+     * @param array $attributes
      * @return \Twig_Markup
      */
-    public function renameAttr($html, $selectors, $attributes)
+    public function renameAttr($html, $selector, array $attributes)
     {
 
-        if (!$html) {
-            return $html;
-        }
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
 
-        $selectors = \is_array($selectors) ? $selectors : [$selectors];
-
-        $doc = new RetconDom($html);
-
-        foreach ($selectors as $selector) {
-
-            if (!$elements = $doc->getElementsBySelector($selector)) {
-                continue;
-            }
-
-            foreach ($elements as $element) {
-
-                foreach ($attributes as $existingAttributeName => $desiredAttributeName) {
-
-                    if (!$desiredAttributeName || $existingAttributeName === $desiredAttributeName || !$element->hasAttribute($existingAttributeName)) {
-                        continue;
-                    }
-
-                    $attributeValue = $element->getAttribute($existingAttributeName);
-                    $element->removeAttribute($existingAttributeName);
-                    $element->setAttribute($desiredAttributeName, $attributeValue);
-
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
+            foreach ($attributes as $existingAttributeName => $desiredAttributeName) {
+                if (!$desiredAttributeName || $existingAttributeName === $desiredAttributeName || !$node->hasAttribute($existingAttributeName)) {
+                    continue;
                 }
-
+                $attributeValue = $node->getAttribute($existingAttributeName);
+                $node->removeAttribute($existingAttributeName);
+                $node->setAttribute($desiredAttributeName, $attributeValue);
             }
-
         }
 
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * remove
-    *
-    * Remove all elements matching given selector(s)
-    *
-    * @selectors Mixed
-    * String or Array of strings
-    *
-    */
     /**
-     * @param $html
-     * @param $selectors
+     * remove
+     * Remove all elements matching given selector(s)
+     *
+     * @param string $html
+     * @param string|array $selector
      * @return \Twig_Markup
      */
-    public function remove($html, $selectors)
+    public function remove($html, $selector)
     {
 
-        if (!$html) {
-            return $html;
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
+
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
+            $node->parentNode->removeChild($node);
         }
 
-        $selectors = \is_array($selectors) ? $selectors : [$selectors];
-
-        $doc = new RetconDom($html);
-
-        foreach ($selectors as $selector) {
-
-            // Get all matching selectors, and remove them
-            if (!$elements = $doc->getElementsBySelector($selector)) {
-                continue;
-            }
-
-            $numElements = $elements->length;
-
-            for ($i = $numElements - 1; $i >= 0; --$i) {
-                $element = $elements->item($i);
-                $element->parentNode->removeChild($element);
-            }
-
-        }
-
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * only
-    *
-    * Remove everything except elements matching given selector(s)
-    *
-    * @selectors Mixed
-    * String or Array of strings
-    *
-    */
     /**
-     * @param $html
-     * @param $selectors
+     * only
+     * Remove everything except nodes matching given selector(s)
+     *
+     * @param string $html
+     * @param string|array $selector
      * @return \Twig_Markup
      */
-    public function only($html, $selectors)
+    public function only($html, $selector)
     {
 
-        if (!$html) {
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
+
+        if (!$nodes) {
             return $html;
         }
 
-        $selectors = \is_array($selectors) ? $selectors : [$selectors];
-
-        $doc = new RetconDom($html);
+        $doc = $dom->getDoc();
         $fragment = $doc->createDocumentFragment();
 
-        foreach ($selectors as $selector) {
-
-            if (!$elements = $doc->getElementsBySelector($selector)) {
-                continue;
-            }
-
-            foreach ($elements as $element) {
-                $fragment->appendChild($element);
-            }
-
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
+            $outerHtml = $node->ownerDocument->saveHTML($node);
+            $fragment->appendXML($outerHtml);
         }
 
         $body = $doc->getElementsByTagName('body')->item(0);
         $body->parentNode->replaceChild($fragment, $body);
 
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * change
-    *
-    * Changes tag type/name for given selector(s)
-    *
-    * @selectors Mixed
-    * String or Array of strings
-    *
-    * @toTag String/Boolean
-    * Tag type matching elements will be converted to, e.g. "span"
-    * Pass `false` to remove tag, retaining content
-    */
     /**
-     * @param $html
-     * @param $selectors
-     * @param $toTag
+     * change
+     * Changes tag type/name for given selector(s). Can also remove tags (whilst retaining their contents) by passing `false` for the $toTag parameter
+     *
+     * @param string $html
+     * @param string|array $selector
+     * @param string|bool $toTag
      * @return \Twig_Markup
      */
-    public function change($html, $selectors, $toTag)
+    public function change($html, $selector, $toTag)
     {
 
-        if (!$html) {
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
+
+        if (!$nodes) {
             return $html;
         }
 
-        $selectors = \is_array($selectors) ? $selectors : [$selectors];
+        $doc = $dom->getDoc();
 
-        $doc = new RetconDom($html);
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
 
-        foreach ($selectors as $selector) {
-
-            // Get all matching selectors, and add/replace attributes
-            if (!$elements = $doc->getElementsBySelector($selector)) {
-                continue;
+            // Deep copy the (inner) element
+            $fragment = $doc->createDocumentFragment();
+            while ($node->childNodes->length > 0) {
+                $fragment->appendChild($node->childNodes->item(0));
             }
-
-            $numElements = $elements->length;
-
-            for ($i = $numElements - 1; $i >= 0; --$i) {
-
-                $element = $elements->item($i);
-
-                // Deep copy the (inner) element
-                $fragment = $doc->createDocumentFragment();
-                while($element->childNodes->length > 0) {
-                    $fragment->appendChild($element->childNodes->item(0));
+            // Remove or change the tag?
+            if (!$toTag) {
+                // Remove it chief
+                $node->parentNode->replaceChild($fragment, $node);
+            } else {
+                // Ch-ch-changes
+                $newElement = $node->ownerDocument->createElement($toTag);
+                foreach ($node->attributes as $attribute) {
+                    $newElement->setAttribute($attribute->nodeName, $attribute->nodeValue);
                 }
-
-                // Remove or change the tag?
-                if (!$toTag) {
-
-                    // Remove it chief
-                    $element->parentNode->replaceChild($fragment, $element);
-
-                } else {
-
-                    // Ch-ch-changes
-                    $newElement = $element->ownerDocument->createElement($toTag);
-                    foreach ($element->attributes as $attribute) {
-                        $newElement->setAttribute($attribute->nodeName, $attribute->nodeValue);
-                    }
-                    $newElement->appendChild($fragment);
-                    $element->parentNode->replaceChild($newElement, $element);
-
-                }
-
+                $newElement->appendChild($fragment);
+                $node->parentNode->replaceChild($newElement, $node);
             }
-
         }
 
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * wrap
-    *
-    * Wraps one or many selectors
-    *
-    * @selectors Mixed
-    * String or Array of strings
-    *
-    * @wrapper String
-    * Element to create as wrapper, e.g. "div.wrapper"
-    *
-    */
     /**
-     * @param $html
-     * @param $selectors
-     * @param $wrapper
+     * wrap
+     * Wraps all nodes matching the given selector(s) in a container
+     *
+     * @param string $html
+     * @param string|array $selector
+     * @param string $container
      * @return \Twig_Markup
      */
-    public function wrap($html, $selectors, $wrapper)
+    public function wrap($html, $selector, $container)
     {
 
-        if (!$html) {
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
+
+        if (!$nodes) {
             return $html;
         }
 
-        $selectors = \is_array($selectors) ? $selectors : [$selectors];
-
-        $doc = new RetconDom($html);
+        $doc = $dom->getDoc();
 
         // Get wrapper
-        $wrapper = RetconHelper::getSelectorObject($wrapper);
-        $wrapper->tag = $wrapper->tag === '*' ? 'div' : $wrapper->tag;
-        $wrapperNode = $doc->createElement($wrapper->tag);
+        $container = RetconHelper::getSelectorObject($container);
+        $container->tag = $container->tag === '*' ? 'div' : $container->tag;
+        $containerNode = $doc->createElement($container->tag);
 
-        if ($wrapper->attribute) {
-            $wrapperNode->setAttribute($wrapper->attribute, $wrapper->attributeValue);
+        if ($container->attribute) {
+            $containerNode->setAttribute($container->attribute, $container->attributeValue);
         }
 
-        foreach ($selectors as $selector) {
-
-            // Get all matching selectors, and add/replace attributes
-            if (!$elements = $doc->getElementsBySelector($selector)) {
-                continue;
-            }
-
-            $numElements = $elements->length;
-
-            for ($i = $numElements - 1; $i >= 0; --$i) {
-
-                $element = $elements->item($i);
-                $wrapperClone = $wrapperNode->cloneNode(true);
-                $element->parentNode->replaceChild($wrapperClone, $element);
-                $wrapperClone->appendChild($element);
-
-            }
-
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
+            $containerClone = $containerNode->cloneNode(true);
+            $node->parentNode->replaceChild($containerClone, $node);
+            $containerClone->appendChild($node);
         }
 
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * unwrap
-    *
-    * Removes the parent of given selector(s), retaining all child nodes
-    *
-    * @selectors Mixed
-    * String or Array of strings
-    *
-    */
     /**
-     * @param $html
-     * @param $selectors
+     * unwrap
+     * Removes the parent of all nodes matching given selector(s), retaining all child nodes
+     *
+     * @param string $html
+     * @param string|array $selector
      * @return \Twig_Markup
      */
-    public function unwrap($html, $selectors)
+    public function unwrap($html, $selector)
     {
 
-        if (!$html) {
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
+
+        if (!$nodes) {
             return $html;
         }
 
-        $selectors = \is_array($selectors) ? $selectors : [$selectors];
+        $doc = $dom->getDoc();
 
-        $doc = new RetconDom($html);
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
+            $parentNode = $node->parentNode;
+            $fragment = $doc->createDocumentFragment();
 
-        foreach ($selectors as $selector) {
-
-            // Get all matching selectors, and add/replace attributes
-            if (!$elements = $doc->getElementsBySelector($selector)) {
-                continue;
+            while ($parentNode->childNodes->length > 0) {
+                $fragment->appendChild($parentNode->childNodes->item(0));
             }
 
-            $numElements = $elements->length;
-
-            for ($i = $numElements - 1; $i >= 0; --$i) {
-
-                $element = $elements->item($i);
-                $parentNode = $element->parentNode;
-                $fragment = $doc->createDocumentFragment();
-
-                while ($parentNode->childNodes->length > 0) {
-                    $fragment->appendChild($parentNode->childNodes->item(0));
-                }
-
-                $parentNode->parentNode->replaceChild($fragment, $parentNode);
-
-            }
-
+            $parentNode->parentNode->replaceChild($fragment, $parentNode);
         }
 
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * inject
-    *
-    * Injects string value into all elements matching given selector(s)
-    *
-    * @selectors Mixed
-    * String or Array of strings
-    *
-    * @toInject String
-    * Content to inject
-    *
-    */
     /**
-     * @param $html
-     * @param $selectors
-     * @param $toInject
+     * inject
+     * Injects string value (could be HTML!) into all nodes matching given selector(s)
+     *
+     * @param string $html
+     * @param string|array $selector
+     * @param string $toInject
      * @param bool $overwrite
      * @return \Twig_Markup
      */
-    public function inject($html, $selectors, $toInject, $overwrite = false)
+    public function inject($html, $selector, $toInject, $overwrite = false)
     {
 
-        if (!$html) {
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
+
+        if (!$nodes) {
             return $html;
         }
 
-        $selectors = \is_array($selectors) ? $selectors : [$selectors];
-
-        $doc = new RetconDom($html);
+        $doc = $dom->getDoc();
 
         // What are we trying to inject, exactly?
         if (\preg_match("/<[^<]+>/", $toInject, $matches) != 0) {
             // Injected content is HTML
-            $fragmentDoc = new RetconDom('<div id="injectWrapper">' . $toInject . '</div>');
-            $injectNode = $fragmentDoc->getElementById('injectWrapper')->childNodes->item(0);
+            $fragment = $doc->createDocumentFragment();
+            $fragment->appendXML($toInject);
+            $injectNode = $fragment->childNodes->item(0);
         } else {
             $textNode = $doc->createTextNode("{$toInject}");
         }
 
-        foreach ($selectors as $selector) {
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
 
-            // Get all matching selectors, and add/replace attributes
-            if (!$elements = $doc->getElementsBySelector($selector)) {
-                continue;
-            }
+            if (!$overwrite) {
 
-            $numElements = $elements->length;
-
-            for ($i = $numElements - 1; $i >= 0; --$i) {
-
-                $element = $elements->item($i);
-
-                if (!$overwrite) {
-
-                    if (isset($injectNode)) {
-                        $element->appendChild($doc->importNode($injectNode->cloneNode(true), true));
-                    } else {
-                        $element->appendChild($textNode->cloneNode());
-                    }
-
+                if (isset($injectNode)) {
+                    $node->appendChild($doc->importNode($injectNode->cloneNode(true), true));
                 } else {
+                    $node->appendChild($textNode->cloneNode());
+                }
 
-                    if (isset($injectNode)) {
-                        $element->nodeValue = "";
-                        $element->appendChild($doc->importNode($injectNode->cloneNode(true), true));
-                    } else {
-                        $element->nodeValue = $toInject;
-                    }
+            } else {
 
+                if (isset($injectNode)) {
+                    $node->nodeValue = "";
+                    $node->appendChild($doc->importNode($injectNode->cloneNode(true), true));
+                } else {
+                    $node->nodeValue = $toInject;
                 }
 
             }
 
         }
 
-        return $doc->getHtml();
+        return $dom->getHtml();
 
     }
 
-    /*
-    * removeEmpty
-    *
-    * Removes empty nodes
-    *
-    * @selectors Mixed
-    * String or Array of strings
-    *
-    */
     /**
-     * @param $html
+     * removeEmpty
+     * Removes empty nodes matching given selector(s), or all empty nodes if no selector
+     *
+     * @param string $html
+     * @param string|array $selector
      * @return \Twig_Markup
      */
-    public function removeEmpty($html)
+    public function removeEmpty($html, $selector = null)
     {
-
-        if (!$html) {
-            return $html;
-        }
-
-        $doc = new RetconDom($html);
-        $xpath = $doc->getXPath();
-
-        while (($nodes = $xpath->query('//*[not(*) and not(@*) and not(text()[normalize-space()])]')) && $nodes->length) {
-            foreach ($nodes as $node) {
-                $node->parentNode->removeChild($node);
+        $dom = new RetconDom($html);
+        $nodes = null;
+        if ($selector) {
+            $nodes = $dom->filter($selector, false);
+            if (!\count($nodes)) {
+                return $html;
             }
         }
-
-        return $doc->getHtml();
-
-    }
-
-    /**
-     * @param $html
-     * @param $pattern
-     * @param string $replace
-     * @param int $limit
-     * @return null|string|string[]
-     */
-    public function replace($html, $pattern, $replace = '', $limit = -1)
-    {
-        if (!$html) {
-            return $html;
-        }
-        return preg_replace($pattern, $replace, $html, $limit);
+        ($nodes ?? $dom)->filterXPath('//*[not(normalize-space())]', false)->each(function (Crawler $node) {
+            $node = $node->getNode(0);
+            $node->parentNode->removeChild($node);
+        });
+        return $dom->getHtml();
     }
 
 }

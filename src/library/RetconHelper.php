@@ -14,6 +14,7 @@ use mmikkel\retcon\Retcon;
 use Craft;
 use craft\base\Image;
 use craft\helpers\FileHelper;
+use craft\helpers\Template as TemplateHelper;
 use craft\helpers\UrlHelper;
 use craft\models\AssetTransform;
 
@@ -30,47 +31,6 @@ class RetconHelper
      * @var array
      */
     protected static $allowedTransformExtensions = ['jpg', 'png', 'gif'];
-
-    /**
-     * @param $selector
-     * @return object
-     */
-    public static function getSelectorObject($selector)
-    {
-
-        $delimiters = array('id' => '#', 'class' => '.');
-
-        $selectorStr = \preg_replace('/\s+/', '', $selector);
-
-        $selector = array(
-            'tag' => $selector,
-            'attribute' => false,
-            'attributeValue' => false,
-        );
-
-        // Check for class or ID
-        foreach ($delimiters as $attribute => $indicator) {
-
-            if (\strpos($selectorStr, $indicator) > -1) {
-
-                $temp = \explode($indicator, $selectorStr);
-
-                $selector['tag'] = $temp[0] !== '' ? $temp[0] : '*';
-
-                if (($attributeValue = $temp[\count($temp) - 1]) !== '') {
-                    $selector['attribute'] = $attribute;
-                    $selector['attributeValue'] = $attributeValue;
-                }
-
-                break;
-
-            }
-
-        }
-
-        return (object) $selector;
-
-    }
 
     /**
      * @param int $width
@@ -151,7 +111,7 @@ class RetconHelper
         /** @var RetconSettings $settings */
         $settings = Retcon::$plugin->getSettings();
 
-        // If we can use Imager, we need to minimal work
+        // If we can use Imager, we need to do minimal work
         if ($settings->useImager) {
             /** @var \aelvan\imager\Imager $imagerPlugin */
             $imagerPlugin = Craft::$app->plugins->getPlugin('imager');
@@ -248,7 +208,7 @@ class RetconHelper
 
         $imageTransformedUrl = self::fixSlashes(str_replace($basePath, ($useAbsoluteUrl ? $baseUrl : ''), $imageTransformedPath));
 
-        return (object) [
+        return (object)[
             'url' => $imageTransformedUrl,
             'width' => $transformWidth,
             'height' => $transformHeight,
@@ -288,7 +248,7 @@ class RetconHelper
             ];
         }
 
-        $imageUrl = $img->getAttribute('src');
+        $imageUrl = RetconHelper::parseRef($img->getAttribute('src'));
 
         if (!$imageUrl) {
             return false;
@@ -318,12 +278,78 @@ class RetconHelper
     }
 
     /**
+     * @param $selector
+     * @return object
+     */
+    public static function getSelectorObject($selector)
+    {
+
+        $delimiters = array('id' => '#', 'class' => '.');
+
+        $selectorStr = \preg_replace('/\s+/', '', $selector);
+
+        $selector = array(
+            'tag' => $selector,
+            'attribute' => false,
+            'attributeValue' => false,
+        );
+
+        // Check for class or ID
+        foreach ($delimiters as $attribute => $indicator) {
+
+            if (\strpos($selectorStr, $indicator) > -1) {
+
+                $temp = \explode($indicator, $selectorStr);
+
+                $selector['tag'] = $temp[0] !== '' ? $temp[0] : '*';
+
+                if (($attributeValue = $temp[\count($temp) - 1]) !== '') {
+                    $selector['attribute'] = $attribute;
+                    $selector['attributeValue'] = $attributeValue;
+                }
+
+                break;
+
+            }
+
+        }
+
+        return (object)$selector;
+
+    }
+
+    /**
      * @param string $str
      * @return null|string|string[]
      */
     public static function fixSlashes(string $str)
     {
         return preg_replace('~(^|[^:])//+~', '\\1/', $str);
+    }
+
+    /**
+     * @param string $value
+     * @return \Twig_Markup
+     */
+    public static function parseRef(string $value)
+    {
+        return TemplateHelper::raw(Craft::$app->getElements()->parseRefs($value, Craft::$app->getSites()->getCurrentSite()->id));
+    }
+
+    /**
+     * @param string $ref
+     * @return int|null
+     */
+    public static function getElementIdFromRef(string $ref)
+    {
+        if ($ref[0] !== '{' || $ref[strlen($ref) - 1] !== '}') {
+            return null;
+        }
+        $refSegments = \explode(':', \strtr($ref, ['{' => '', '}' => '']));
+        if (\count($refSegments) !== 3 || !($id = (int)$refSegments[1] ?? null)) {
+            return null;
+        }
+        return $id;
     }
 
 }

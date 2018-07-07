@@ -25,5 +25,5 @@
 return [
     'baseTransformPath' => '@webroot', // Base transform path for images
     'baseTransformUrl' => '/', // Base transform URL for images
-    'useImager' => true, // Use the Imager plugin for transform (if it's installed)
+    'useImager' => true, // Use the Imager plugin for transforms (if it's installed)
 ];

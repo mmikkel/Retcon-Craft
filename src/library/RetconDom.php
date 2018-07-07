@@ -9,78 +9,77 @@
 namespace mmikkel\retcon\library;
 
 use Craft;
-use craft\helpers\Template;
+use craft\helpers\Template as TemplateHelper;
 
-class RetconDom extends \DOMDocument
+use Masterminds\HTML5;
+use Symfony\Component\DomCrawler\Crawler;
+
+class RetconDom
 {
 
     /**
-     * @var
+     * @var \DOMDocument
      */
-    private $outputEncoding;
+    protected $doc;
     /**
-     * @var
+     * @var Crawler
      */
-    private $xpath;
+    protected $crawler;
 
     /**
      * RetconDom constructor.
-     * @param bool $html
-     */
-    public function __construct($html = false)
-    {
-
-        parent::__construct();
-
-        \libxml_use_internal_errors(true);
-
-        $this->outputEncoding = Craft::$app->getView()->getTwig()->getCharset();
-
-        if ($html) {
-            $this->loadHtml($html);
-        }
-
-        $this->preserveWhiteSpace = false;
-
-    }
-
-    /**
-     * @param string $selectorStr
-     * @return bool|\DOMNodeList
-     */
-    public function getElementsBySelector(string $selectorStr)
-    {
-
-        $selector = RetconHelper::getSelectorObject($selectorStr);
-
-        // ID or class
-        if ($selector->attribute) {
-
-            $xpath = $this->getXPath();
-
-            $query = '//' . $selector->tag . '[contains(concat(" ",@' . $selector->attribute . '," "), " ' . $selector->attributeValue . ' ")]';
-
-            $elements = $xpath->query($query);
-
-        } else {
-
-            $elements = $this->getElementsByTagName($selector->tag);
-
-        }
-
-        return $elements && $elements->length > 0 ? $elements : false;
-
-    }
-
-    /**
      * @param string $html
-     * @param null $options
-     * @return bool|void
      */
-    public function loadHtml($html, $options = null)
+    public function __construct($html)
     {
-        parent::loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', $this->outputEncoding));
-        $this->normalize();
+        $this->doc = new \DOMDocument();
+        $libxmlUseInternalErrors = \libxml_use_internal_errors(true);
+        $this->doc->loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset()));
+        \libxml_use_internal_errors($libxmlUseInternalErrors);
+        $this->crawler = new Crawler($this->doc);
+    }
+
+    /**
+     * @param string|array $selector
+     * @param bool $asArray
+     * @return array|Crawler
+     */
+    public function filter($selector, bool $asArray = true)
+    {
+        if (\is_array($selector)) {
+            $selector = \implode(',', $selector);
+        }
+        $nodes = $this->crawler->filter($selector);
+        if (!$asArray) {
+            return $nodes;
+        }
+        return $nodes->each(function (Crawler $node) {
+            return $node->getNode(0);
+        });
+    }
+
+    /**
+     * @param string $selector
+     * @param string $selector
+     * @return array|Crawler
+     */
+    public function filterXPath(string $selector, bool $asArray = true)
+    {
+        $nodes = $this->crawler->filterXPath($selector);
+        if (!$asArray) {
+            return $nodes;
+        }
+        return $nodes->each(function (Crawler $node) {
+            return $node->getNode(0);
+        });
+    }
+
+    /**
+     * @return \DOMDocument
+     */
+    public function getDoc(): \DOMDocument
+    {
+        return $this->doc;
     }
 
     /**
@@ -88,18 +87,8 @@ class RetconDom extends \DOMDocument
      */
     public function getHtml()
     {
-        return Template::raw(\preg_replace('~<(?:!DOCTYPE|/?(?:html|head|body))[^>]*>\s*~i', '', parent::saveHTML()));
-    }
-
-    /**
-     * @return \DomXPath
-     */
-    public function getXPath()
-    {
-        if (!isset($this->xpath)) {
-            $this->xpath = new \DomXPath($this);
-        }
-        return $this->xpath;
+        $html5 = new HTML5();
+        return TemplateHelper::raw(\preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html5->saveHTML($this->doc)));
     }
 
 }

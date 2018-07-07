@@ -10,6 +10,9 @@
 
 namespace mmikkel\retcon\twigextensions;
 
+use mmikkel\retcon\Retcon;
+use mmikkel\retcon\services\RetconService;
+
 /**
  * Twig can be extended in many ways; you can add extra tags, filters, tests, operators,
  * global variables, and functions. You can even extend the parser itself with
@@ -36,8 +39,17 @@ class RetconTwigExtension extends \Twig_Extension
      */
     public function getFilters()
     {
-        return array_map(function ($method) {
-            return new \Twig_SimpleFilter('retcon' . ($method != 'retcon' ? ucfirst($method) : ''), array('mmikkel\retcon\library\RetconApi', $method));
-        }, get_class_methods('mmikkel\retcon\library\RetconApi'));
+        // Generate Twig filters from all public methods in the RetconService class
+        $class = new \ReflectionClass(RetconService::class);
+        $methods = \array_reduce($class->getMethods(\ReflectionMethod::IS_PUBLIC), function ($carry, $method) {
+            if ($method->class === RetconService::class) {
+                $carry[] = $method->name;
+            }
+            return $carry;
+        }, []);
+        return \array_map(function ($method) {
+            $filterName = 'retcon' . ($method != 'retcon' ? \ucfirst($method) : '');
+            return new \Twig_SimpleFilter($filterName, [Retcon::$plugin->retcon, $method]);
+        }, $methods);
     }
 }
