@@ -25,6 +25,10 @@ class RetconDom
      * @var Crawler
      */
     protected $crawler;
+    /**
+     * @var HTML5
+     */
+    protected $html5;
 
     /**
      * RetconDom constructor.
@@ -32,11 +36,12 @@ class RetconDom
      */
     public function __construct($html)
     {
-        $this->doc = new \DOMDocument();
         $libxmlUseInternalErrors = \libxml_use_internal_errors(true);
+        $this->html5 = new HTML5();
+        $this->doc = new \DOMDocument();
         $this->doc->loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset()));
-        \libxml_use_internal_errors($libxmlUseInternalErrors);
         $this->crawler = new Crawler($this->doc);
+        \libxml_use_internal_errors($libxmlUseInternalErrors);
     }
 
     /**
@@ -85,10 +90,9 @@ class RetconDom
     /**
      * @return \Twig_Markup
      */
-    public function getHtml()
+    public function getHtml(\DOMNode $node = null)
     {
-        $html5 = new HTML5();
-        return TemplateHelper::raw(\preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html5->saveHTML($this->doc)));
+        return TemplateHelper::raw(\preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $this->html5->saveHTML($node ?: $this->doc)));
     }
 
 }

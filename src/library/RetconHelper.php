@@ -11,6 +11,9 @@ namespace mmikkel\retcon\library;
 use mmikkel\retcon\models\RetconSettings;
 use mmikkel\retcon\Retcon;
 
+use Symfony\Component\DomCrawler\Crawler;
+use Masterminds\HTML5;
+
 use Craft;
 use craft\base\Image;
 use craft\helpers\FileHelper;

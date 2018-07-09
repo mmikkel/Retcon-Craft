@@ -44,7 +44,7 @@ class RetconService extends Component
      * @return mixed
      * @throws Exception
      */
-    public function retcon($html, $args)
+    public function retcon(string $html, $args)
     {
 
         if (!$html) {
@@ -89,7 +89,7 @@ class RetconService extends Component
      * @return \Twig_Markup
      * @throws \craft\errors\AssetTransformException
      */
-    public function transform($html, $transform, $selector = 'img', array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
+    public function transform(string $html, $transform, $selector = 'img', array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
     {
 
         $dom = new RetconDom($html);
@@ -145,7 +145,7 @@ class RetconService extends Component
      * @param array $configOverrides
      * @return \Twig_Markup
      */
-    public function srcset($html, $transforms, $selector = 'img', $sizes = '100w', $base64src = false, $transformDefaults = [], $configOverrides = [])
+    public function srcset(string $html, $transforms, $selector = 'img', $sizes = '100w', $base64src = false, $transformDefaults = [], $configOverrides = [])
     {
 
         $dom = new RetconDom($html);
@@ -231,7 +231,7 @@ class RetconService extends Component
      * @param string $attributeName
      * @return \Twig_Markup
      */
-    public function lazy($html, $selector = 'img', $className = 'lazyload', $attributeName = 'src')
+    public function lazy(string $html, $selector = 'img', string $className = 'lazyload', string $attributeName = 'src')
     {
 
         $dom = new RetconDom($html);
@@ -270,7 +270,7 @@ class RetconService extends Component
      * @param bool $overwrite
      * @return \Twig_Markup
      */
-    public function autoAlt($html, $selector = 'img', $field = 'title', $overwrite = false)
+    public function autoAlt(string $html, $selector = 'img', string $field = 'title', bool $overwrite = false)
     {
 
         $dom = new RetconDom($html);
@@ -310,7 +310,7 @@ class RetconService extends Component
      * @param bool $overwrite
      * @return \Twig_Markup
      */
-    public function attr($html, $selector, $attributes, $overwrite = true)
+    public function attr(string $html, $selector, array $attributes, bool $overwrite = true)
     {
 
         $dom = new RetconDom($html);
