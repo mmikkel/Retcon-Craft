@@ -29,6 +29,10 @@ class RetconDom
      * @var HTML5
      */
     protected $html5;
+    /**
+     * @var bool
+     */
+    protected $stripDoctype;
 
     /**
      * RetconDom constructor.
@@ -37,6 +41,7 @@ class RetconDom
     public function __construct($html)
     {
         $libxmlUseInternalErrors = \libxml_use_internal_errors(true);
+        $this->stripDoctype = !\preg_match('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', $html);
         $this->html5 = new HTML5();
         $this->doc = new \DOMDocument();
         $this->doc->loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset()));
@@ -65,7 +70,7 @@ class RetconDom
 
     /**
      * @param string $selector
-     * @param string $selector
+     * @param bool $asArray
      * @return array|Crawler
      */
     public function filterXPath(string $selector, bool $asArray = true)
@@ -88,11 +93,27 @@ class RetconDom
     }
 
     /**
+     * @return Crawler
+     */
+    public function getCrawler(): Crawler
+    {
+        return $this->crawler;
+    }
+
+    /**
      * @return \Twig_Markup
      */
-    public function getHtml(\DOMNode $node = null)
+    public function getHtml()
     {
-        return TemplateHelper::raw(\preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $this->html5->saveHTML($node ?: $this->doc)));
+        $html = '';
+        if ($this->stripDoctype) {
+            $html = \implode('', \array_map(function (\DOMNode $node) {
+                return $this->html5->saveHTML($node);
+            }, \iterator_to_array($this->doc->getElementsByTagName('body')->item(0)->childNodes)));
+        } else {
+            $html = $this->html5->saveHTML($this->doc);
+        }
+        return TemplateHelper::raw($html);
     }
 
 }
