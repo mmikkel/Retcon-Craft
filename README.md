@@ -63,7 +63,7 @@ Except for the `replace` method being removed, Retcon 2.x should be completely b
 
 ## Basic usage
 
-Retcon exposes a series of different [methods](#methods) for modyfing HTML. Most methods take a `selector` parameter (i.e. the selector(s) for the elements you want to modify, e.g. `'img'`, `'p'` or `'div.foobar'`), and some take additional parameters for further configuration.
+Retcon exposes a series of different [methods](#methods) for modifying HTML. Most methods take a `selector` parameter (i.e. the selector(s) for the elements you want to modify, e.g. `'img'`, `'p'` or `'div.foobar'`), and some take additional parameters for further configuration.
 
 Note that it doesn't matter if your HTML is from a WYSIWYG field (Redactor or CK Editor) or just a regular ol' string. If it's HTML, Retcon will eat it.
 
