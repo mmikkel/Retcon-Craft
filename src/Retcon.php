@@ -10,7 +10,6 @@
 
 namespace mmikkel\retcon;
 
-use mmikkel\retcon\library\RetconApi;
 use mmikkel\retcon\services\RetconService;
 use mmikkel\retcon\twigextensions\RetconTwigExtension;
 use mmikkel\retcon\models\RetconSettings;
@@ -86,7 +85,7 @@ class Retcon extends Plugin
             function (Event $event) {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
-                $variable->set('retcon', RetconApi::class);
+                $variable->set('retcon', RetconService::class);
             }
         );
 
@@ -110,7 +109,7 @@ class Retcon extends Plugin
          */
         Craft::info(
             Craft::t(
-                'retcon',
+                'app',
                 '{name} plugin loaded',
                 ['name' => $this->name]
             ),
