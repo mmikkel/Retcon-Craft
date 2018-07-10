@@ -105,13 +105,9 @@ class RetconDom
      */
     public function getHtml()
     {
-        $html = '';
+        $html = $this->html5->saveHTML($this->doc);
         if ($this->stripDoctype) {
-            $html = \implode('', \array_map(function (\DOMNode $node) {
-                return $this->html5->saveHTML($node);
-            }, \iterator_to_array($this->doc->getElementsByTagName('body')->item(0)->childNodes)));
-        } else {
-            $html = $this->html5->saveHTML($this->doc);
+            $html = \preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html);
         }
         return TemplateHelper::raw($html);
     }
