@@ -1,4 +1,4 @@
-# Retcon plugin for Craft CMS 3.x
+# Retcon 2 plugin for Craft CMS 3.x
 
 Retcon is a tiny Craft CMS plugin adding a series of powerful Twig filters for modifying HTML content. **Here are some of the things Retcon can do:**
 
@@ -154,6 +154,22 @@ In Retcon 2.x, _almost all CSS selectors_ will work – see the [CssSelector](ht
 Multiple selectors can be defined as a comma-separated string (i.e. `'p, span'`) or as an array (i.e. `['p', 'span']`).
 
 ### Methods
+
+**NOTE/TODO: The Wiki is written for the v. 1.x branch and hasn't been updated yet. No biggie, basically all methods will work the same as before, except for the `lazy`, `transform` and `srcset` methods which have been granted an additional parameter `$selector` (third parameter for `transform` and `srcset`; second parameter for `lazy`).  **
+
+**Also, a wiki for the `removeEmpty` method hasn't been created yet, but it looks like this:**  
+
+```twig
+{{ entry.body | retconRemoveEmpty }}
+```
+
+to remove all empty nodes, or
+
+```twig
+{{ entry.body | retconRemoveEmpty('p') }}
+```
+
+to just remove empty paragraph tags.  
 
 **[transform](https://github.com/mmikkel/Retcon-Craft/wiki/Transform)**
 Apply a named or inline image transform to all images. **If installed, Retcon uses [Imager](https://github.com/aelvan/Imager-Craft) to apply the transform.**  
