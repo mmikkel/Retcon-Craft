@@ -11,7 +11,6 @@
 namespace mmikkel\retcon\services;
 
 use mmikkel\retcon\Retcon;
-use mmikkel\retcon\library\RetconCrawler;
 use mmikkel\retcon\library\RetconDom;
 use mmikkel\retcon\library\RetconHelper;
 
