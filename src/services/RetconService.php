@@ -45,14 +45,14 @@ class RetconService extends Component
      * @return mixed
      * @throws Exception
      */
-    public function retcon(string $html, $args)
+    public function retcon(string $html, ...$args)
     {
 
         if (!$html) {
             return '';
         }
 
-        if (empty($args)) {
+        if (!$args) {
             throw new Exception(Craft::t('retcon', 'No filter method or callbacks defined'));
         }
 
@@ -60,9 +60,8 @@ class RetconService extends Component
 
         foreach ($operations as $operation) {
 
-            $args = \is_array($operation) ? $operation : [$operation];
-
-            $filter = \array_shift($args);
+            $filter = \array_shift($operation);
+            $args = $operation;
 
             if (!\method_exists($this, $filter)) {
                 throw new Exception(Craft::t('retcon', 'Undefined filter method {filter}', [
@@ -693,7 +692,7 @@ class RetconService extends Component
             $node = $node->getNode(0);
             $node->parentNode->removeChild($node);
         });
-        
+
         return $dom->getHtml();
     }
 
