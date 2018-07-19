@@ -49,10 +49,10 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
-        if (!$args) {
+        if (empty($args)) {
             throw new Exception(Craft::t('retcon', 'No filter method or callbacks defined'));
         }
 
@@ -93,7 +93,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -153,7 +153,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -243,7 +243,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -286,7 +286,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -330,7 +330,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -375,7 +375,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -409,7 +409,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -436,7 +436,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -475,7 +475,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -527,7 +527,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -571,7 +571,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -613,7 +613,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
@@ -675,7 +675,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return '';
+            return TemplateHelper::raw('');
         }
 
         $dom = new RetconDom($html);
