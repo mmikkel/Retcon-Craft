@@ -17,8 +17,10 @@ use mmikkel\retcon\library\RetconHelper;
 use Craft;
 use craft\base\Component;
 use craft\elements\Asset;
+use craft\helpers\Template as TemplateHelper;
 
 use Symfony\Component\DomCrawler\Crawler;
+use Twig\Template;
 use yii\base\Exception;
 
 /**
@@ -47,7 +49,7 @@ class RetconService extends Component
     {
 
         if (!$html) {
-            return $html;
+            return '';
         }
 
         if (empty($args)) {
@@ -91,17 +93,21 @@ class RetconService extends Component
     public function transform(string $html, $transform, $selector = 'img', array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
     {
 
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (!$nodes) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $transform = RetconHelper::getImageTransform($transform);
 
         if (!$transform) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         /** @var \DOMElement $node */
@@ -147,11 +153,15 @@ class RetconService extends Component
     public function srcset(string $html, $transforms, $selector = 'img', $sizes = '100w', $base64src = false, $transformDefaults = [], $configOverrides = [])
     {
 
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (!$nodes) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         // Get transforms
@@ -168,7 +178,7 @@ class RetconService extends Component
         }, []);
 
         if (empty($transforms)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         // Get sizes attribute
@@ -233,6 +243,10 @@ class RetconService extends Component
     public function lazy(string $html, $selector = 'img', string $className = 'lazyload', string $attributeName = 'src')
     {
 
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
         $attributeName = "data-{$attributeName}";
@@ -271,6 +285,10 @@ class RetconService extends Component
      */
     public function autoAlt(string $html, $selector = 'img', string $field = 'title', bool $overwrite = false)
     {
+
+        if (!$html) {
+            return '';
+        }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
@@ -311,6 +329,10 @@ class RetconService extends Component
      */
     public function attr(string $html, $selector, array $attributes, bool $overwrite = true)
     {
+
+        if (!$html) {
+            return '';
+        }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
@@ -353,6 +375,10 @@ class RetconService extends Component
     public function renameAttr($html, $selector, array $attributes)
     {
 
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
@@ -383,6 +409,10 @@ class RetconService extends Component
     public function remove($html, $selector)
     {
 
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
@@ -406,11 +436,15 @@ class RetconService extends Component
     public function only($html, $selector)
     {
 
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (!$nodes) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $doc = $dom->getDoc();
@@ -441,11 +475,15 @@ class RetconService extends Component
     public function change($html, $selector, $toTag)
     {
 
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (!$nodes) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $doc = $dom->getDoc();
@@ -489,11 +527,15 @@ class RetconService extends Component
     public function wrap($html, $selector, $container)
     {
 
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (!$nodes) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $doc = $dom->getDoc();
@@ -529,11 +571,15 @@ class RetconService extends Component
     public function unwrap($html, $selector)
     {
 
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (!$nodes) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $doc = $dom->getDoc();
@@ -567,11 +613,15 @@ class RetconService extends Component
     public function inject($html, $selector, $toInject, $overwrite = false)
     {
 
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (!$nodes) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $doc = $dom->getDoc();
@@ -624,18 +674,26 @@ class RetconService extends Component
      */
     public function removeEmpty($html, $selector = null)
     {
+
+        if (!$html) {
+            return '';
+        }
+
         $dom = new RetconDom($html);
         $nodes = null;
+
         if ($selector) {
             $nodes = $dom->filter($selector, false);
             if (!\count($nodes)) {
-                return $html;
+                return TemplateHelper::raw($html);
             }
         }
+
         ($nodes ?? $dom)->filterXPath('//*[not(normalize-space())]', false)->each(function (Crawler $node) {
             $node = $node->getNode(0);
             $node->parentNode->removeChild($node);
         });
+        
         return $dom->getHtml();
     }
 
