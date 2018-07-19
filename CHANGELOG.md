@@ -1,6 +1,6 @@
 # Retcon Changelog
 
-## 2.0.2 – 2018-07-18
+## 2.0.2 - 2018-07-18
 ### Fixed
 - Various minor issues fixed
 
@@ -16,7 +16,7 @@
 
 ### Improved
 - Selectors are much, _much_ more flexible (almost all CSS selectors work, which means that Retcon is basically jQuery now!) due to the magic of Symfony's DomCrawler component
-- **Full HTML5 support** :tada:
+- **Full HTML5 support**
 - The `retconAutoAlt` filter will use the Asset's `title` for the `alt` attribute, if Retcon is fed markup with Craft CMS reference tags
 - The `retconTransform`, `retconLazy` and `retconSrcSet` filters now take an additional parameter – `selector` (defaults to `'img'`)
 
