@@ -42,7 +42,9 @@ class RetconDom
     {
         $libxmlUseInternalErrors = \libxml_use_internal_errors(true);
         $this->stripDoctype = !\preg_match('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', $html);
-        $this->html5 = new HTML5();
+        $this->html5 = new HTML5([
+            'encode_entities' => false,
+        ]);
         $this->doc = new \DOMDocument();
         $this->doc->loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset()));
         $this->crawler = new Crawler($this->doc);
@@ -107,7 +109,7 @@ class RetconDom
     {
         $html = $this->html5->saveHTML($this->doc);
         if ($this->stripDoctype) {
-            $html = \preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html);
+            $html = \html_entity_decode(\preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html));
         }
         return TemplateHelper::raw($html);
     }
