@@ -5,13 +5,13 @@
 ### Fixed
 - Various minor issues fixed
 
-## 2.0.1 – 2018-07-18
+## 2.0.1 - 2018-07-18
 ### Fixed
 - Fixes various issues with the `retcon` catch-all filter
 - Fixes an issue where Retcon would entity encode HTML tags when no nodes matched the given selector for methods such as `srcset`, `transform` and others
 - Fixes an issue where Retcon would entity encode non-breaking spaces
 
-## 2.0.0 – 2018-07-18
+## 2.0.0 - 2018-07-18
 ### Added
 - New filter `retconRemoveEmpty` added, which will remove empty DOM nodes (e.g. `<p>` tags without text content)
 
