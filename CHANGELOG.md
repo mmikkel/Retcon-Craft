@@ -1,5 +1,8 @@
 # Retcon Changelog
 
+## 2.0.3 - 2018-07-21
+### Fixed
+- Retcon no longers attempt to decode quote entities, to fix an issue where serialized data in HTML attributes were getting butchered
 
 ## 2.0.2 - 2018-07-18
 ### Fixed

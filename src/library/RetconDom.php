@@ -109,7 +109,7 @@ class RetconDom
     {
         $html = $this->html5->saveHTML($this->doc);
         if ($this->stripDoctype) {
-            $html = \html_entity_decode(\preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html));
+            $html = \html_entity_decode(\preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html), ENT_NOQUOTES);
         }
         return TemplateHelper::raw($html);
     }
