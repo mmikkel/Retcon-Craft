@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.0.4 - 2018-07-25
+### Fixed
+- Fixes a recently introduced regression error in the "retcon" catch-all method, affecting the "srcset" method and others.
+
 ## 2.0.3 - 2018-07-21
 ### Fixed
 - Retcon no longers attempt to decode quote entities, to fix an issue where serialized data in HTML attributes were getting butchered
