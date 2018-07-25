@@ -51,28 +51,26 @@ class RetconService extends Component
         if (!$html) {
             return TemplateHelper::raw('');
         }
-
+        
         if (empty($args)) {
-            throw new Exception(Craft::t('retcon', 'No filter method or callbacks defined'));
+            throw new Exception(Craft::t('No filter method or callbacks defined'));
         }
-
-        $operations = \is_array($args[0]) ? $args[0] : [$args];
-
-        foreach ($operations as $operation) {
-
-            $filter = \array_shift($operation);
-            $args = $operation;
-
+        
+        $ops = \is_array($args[0]) ? $args[0] : [$args];
+        
+        foreach ($ops as $op) {
+            
+            $args = \is_array($op) ? $op : [$op];
+            $filter = \array_shift($args);
+            
             if (!\method_exists($this, $filter)) {
-                throw new Exception(Craft::t('retcon', 'Undefined filter method {filter}', [
-                    'filter' => $filter,
-                ]));
+                throw new Exception(Craft::t('Undefined filter method {$filter}'));
             }
-
+            
             $html = \call_user_func_array([$this, $filter], \array_merge([$html], $args));
-
+            
         }
-
+        
         return $html;
 
     }
