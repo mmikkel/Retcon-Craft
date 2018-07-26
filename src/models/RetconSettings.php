@@ -2,9 +2,9 @@
 
 namespace mmikkel\retcon\models;
 
-use Yii;
 use Craft;
 use craft\base\Model;
+use craft\helpers\StringHelper;
 
 class RetconSettings extends Model
 {
@@ -17,7 +17,7 @@ class RetconSettings extends Model
     /**
      * @var string
      */
-    public $baseTransformUrl = '/';
+    public $baseTransformUrl = '@web';
 
     /**
      * @var bool
@@ -25,13 +25,21 @@ class RetconSettings extends Model
     public $useImager = true;
 
     /**
+     * Settings constructor.
      *
+     * @param array $config
      */
-    public function init()
+    public function __construct($config = [])
     {
-        $this->baseTransformPath = \rtrim(Yii::getAlias($this->baseTransformPath), '/') . '/';
-        $this->baseTransformUrl = \rtrim(Yii::getAlias($this->baseTransformUrl), '/') . '/';
-        $this->useImager = $this->useImager && Craft::$app->getPlugins()->getPlugin('imager');
+
+        $config = \array_merge($config, Craft::$app->getConfig()->getConfigFromFile('retcon'));
+
+        parent::__construct($config);
+
+        if (!empty($config)) {
+            \Yii::configure($this, $config);
+        }
+
     }
 
 }

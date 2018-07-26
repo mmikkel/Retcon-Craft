@@ -17,6 +17,7 @@ use Masterminds\HTML5;
 use Craft;
 use craft\base\Image;
 use craft\helpers\FileHelper;
+use craft\helpers\StringHelper;
 use craft\helpers\Template as TemplateHelper;
 use craft\helpers\UrlHelper;
 use craft\models\AssetTransform;
@@ -115,19 +116,21 @@ class RetconHelper
         $settings = Retcon::$plugin->getSettings();
 
         // If we can use Imager, we need to do minimal work
-        if ($settings->useImager) {
+        if ($settings->useImager && Craft::$app->getPlugins()->getPlugin('imager')) {
             /** @var \aelvan\imager\Imager $imagerPlugin */
             $imagerPlugin = Craft::$app->plugins->getPlugin('imager');
             return $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults, $imagerConfigOverrides);
         }
 
+        $transform = (object) $transform;
+
         // Normalize the transform
-        $transformWidth = $transform->width ?: 'AUTO';
-        $transformHeight = $transform->height ?: 'AUTO';
-        $transformMode = $transform->mode ?: 'crop';
-        $transformPosition = $transform->position ?: 'center-center';
-        $transformQuality = $transform->quality ?: Craft::$app->getConfig()->getGeneral()->defaultImageQuality ?: 90;
-        $transformFormat = $transform->format ?: null;
+        $transformWidth = $transform->width ?? 'AUTO';
+        $transformHeight = $transform->height ?? 'AUTO';
+        $transformMode = $transform->mode ?? 'crop';
+        $transformPosition = $transform->position ?? 'center-center';
+        $transformQuality = $transform->quality ?? Craft::$app->getConfig()->getGeneral()->defaultImageQuality ?? 90;
+        $transformFormat = $transform->format ?? null;
 
         // Set format to jpg if we dont have Imagick installed
         if ($transformFormat !== 'jpg' && !Craft::$app->getImages()->getIsImagick()) {
@@ -147,9 +150,9 @@ class RetconHelper
         }
 
         // Get basepaths and URLs
-        $basePath = $settings->baseTransformPath;
-        $baseUrl = $settings->baseTransformUrl;
-        $siteUrl = UrlHelper::siteUrl();
+        $basePath = StringHelper::ensureRight(Craft::getAlias($settings->baseTransformPath), '/');
+        $baseUrl = StringHelper::ensureRight(Craft::getAlias($settings->baseTransformUrl), '/');
+        $siteUrl = StringHelper::ensureRight(UrlHelper::siteUrl(), '/');
 
         $host = \parse_url($siteUrl, PHP_URL_HOST);
 
@@ -168,8 +171,6 @@ class RetconHelper
             return false;
         }
 
-        $useAbsoluteUrl = rtrim($baseUrl, '/') !== rtrim($siteUrl, '/') || strpos($imageUrl, 'http') > -1 ? true : false;
-
         // Build filename/path
         $imageTransformedFilename = self::fixSlashes($imagePathInfo['filename'] . '.' . ($transformFormat ?: $imagePathInfo['extension']));
         $imageTransformedFolder = self::fixSlashes($basePath . $imagePathInfo['dirname'] . '/_' . $transformHandle);
@@ -177,7 +178,8 @@ class RetconHelper
 
         // Exit if local file doesn't exist
         $isDevMode = Craft::$app->getConfig()->getGeneral()->devMode;
-        $imagePath = $basePath . $imageUrlInfo['path'];
+        $imagePath = RetconHelper::fixSlashes($basePath . '/' . $imageUrlInfo['path']);
+
         if (!\file_exists($imagePath)) {
             if ($isDevMode) {
                 throw new Exception(Craft::t('retcon', 'Image {path} not found', [
@@ -193,10 +195,8 @@ class RetconHelper
         // Transform image
         if (!\file_exists($imageTransformedPath)) {
 
-            $docImagePath = self::fixSlashes($basePath . $imageUrlInfo['path']);
-
             /** @var Image $image */
-            $image = Craft::$app->getImages()->loadImage($docImagePath);
+            $image = Craft::$app->getImages()->loadImage($imagePath);
 
             if (!$image) {
                 if ($isDevMode) {
@@ -231,7 +231,7 @@ class RetconHelper
 
         }
 
-        $imageTransformedUrl = self::fixSlashes(\str_replace($basePath, ($useAbsoluteUrl ? $baseUrl : ''), $imageTransformedPath));
+        $imageTransformedUrl = self::fixSlashes(\str_replace($basePath, $baseUrl, $imageTransformedPath));
 
         return (object)[
             'url' => $imageTransformedUrl,
