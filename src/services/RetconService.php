@@ -115,7 +115,7 @@ class RetconService extends Component
             }
 
             if (!$transformedImage = RetconHelper::getTransformedImage($src, $transform, $imagerTransformDefaults, $imagerConfigOverrides)) {
-                return;
+                continue;
             }
 
             $node->setAttribute('src', $transformedImage->url);
