@@ -176,7 +176,14 @@ class RetconHelper
         $imageTransformedPath = self::fixSlashes($imageTransformedFolder . '/' . $imageTransformedFilename);
 
         // Exit if local file doesn't exist
-        if (!\file_exists($basePath . $imageUrlInfo['path'])) {
+        $isDevMode = Craft::$app->getConfig()->getGeneral()->devMode;
+        $imagePath = $basePath . $imageUrlInfo['path'];
+        if (!\file_exists($imagePath)) {
+            if ($isDevMode) {
+                throw new Exception(Craft::t('retcon', 'Image {path} not found', [
+                    'path' => $imagePath,
+                ]));
+            }
             return false;
         }
 
@@ -192,6 +199,11 @@ class RetconHelper
             $image = Craft::$app->getImages()->loadImage($docImagePath);
 
             if (!$image) {
+                if ($isDevMode) {
+                    throw new Exception(Craft::t('retcon', 'Unable to load image {path}', [
+                        'path' => $imagePath,
+                    ]));
+                }
                 return false;
             }
 
@@ -206,10 +218,20 @@ class RetconHelper
                     $image->resize($transform->width, $transform->height);
             }
 
-            $image->saveAs($imageTransformedPath);
+            $success = $image->saveAs($imageTransformedPath);
+
+            if (!$success) {
+                if ($isDevMode) {
+                    throw new Exception(Craft::t('retcon', 'Unable to save image {path} to {savePath}', [
+                        'path' => $imagePath,
+                        'savePath' => $imageTransformedPath,
+                    ]));
+                }
+            }
+
         }
 
-        $imageTransformedUrl = self::fixSlashes(str_replace($basePath, ($useAbsoluteUrl ? $baseUrl : ''), $imageTransformedPath));
+        $imageTransformedUrl = self::fixSlashes(\str_replace($basePath, ($useAbsoluteUrl ? $baseUrl : ''), $imageTransformedPath));
 
         return (object)[
             'url' => $imageTransformedUrl,
