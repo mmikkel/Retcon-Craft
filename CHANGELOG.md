@@ -1,5 +1,13 @@
 # Retcon Changelog
 
+## 2.0.5 - 2018-07-28
+### Fixed
+- Fixes a bug where the `transform` method would return an empty string if Retcon would fail to transform an image
+- Fixes various issues related to the project config file (i.e. `/config/retcon.php`) and plugin settings
+
+### Improved
+- Improves image path handling for the `srcset` and `transform` methods
+
 ## 2.0.4 - 2018-07-25
 ### Fixed
 - Fixes a recently introduced regression error in the "retcon" catch-all method, affecting the "srcset" method and others.
