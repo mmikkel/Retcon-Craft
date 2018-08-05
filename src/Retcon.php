@@ -117,10 +117,7 @@ class Retcon extends Plugin
         );
     }
 
-    /**
-     * @return \craft\base\Model|RetconSettings|null
-     */
-    protected function createSettingsModel()
+    public function getSettings()
     {
         return new RetconSettings();
     }

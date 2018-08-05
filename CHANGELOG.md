@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.0.6 - 2018-08-05
+### Fixed
+- Fixes an issue where Retcon would attempt to use Imager for transforms, even if Imager was not installed or deactivated
+
 ## 2.0.5 - 2018-07-28
 ### Fixed
 - Fixes a bug where the `transform` method would return an empty string if Retcon would fail to transform an image

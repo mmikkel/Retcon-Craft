@@ -116,7 +116,7 @@ class RetconHelper
         $settings = Retcon::$plugin->getSettings();
 
         // If we can use Imager, we need to do minimal work
-        if ($settings->useImager && Craft::$app->getPlugins()->getPlugin('imager')) {
+        if ($settings->useImager) {
             /** @var \aelvan\imager\Imager $imagerPlugin */
             $imagerPlugin = Craft::$app->plugins->getPlugin('imager');
             return $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults, $imagerConfigOverrides);
@@ -150,8 +150,8 @@ class RetconHelper
         }
 
         // Get basepaths and URLs
-        $basePath = StringHelper::ensureRight(Craft::getAlias($settings->baseTransformPath), '/');
-        $baseUrl = StringHelper::ensureRight(Craft::getAlias($settings->baseTransformUrl), '/');
+        $basePath = StringHelper::ensureRight($settings->baseTransformPath, '/');
+        $baseUrl = StringHelper::ensureRight($settings->baseTransformUrl, '/');
         $siteUrl = StringHelper::ensureRight(UrlHelper::siteUrl(), '/');
 
         $host = \parse_url($siteUrl, PHP_URL_HOST);
