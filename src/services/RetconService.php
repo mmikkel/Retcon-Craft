@@ -40,15 +40,15 @@ class RetconService extends Component
 {
 
     /**
-     * @param string $html
+     * @param string|null $html
      * @param $args
      * @return mixed
      * @throws Exception
      */
-    public function retcon(string $html, ...$args)
+    public function retcon($html, ...$args)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
         
@@ -79,7 +79,7 @@ class RetconService extends Component
      * transform
      * Applies an image transform to all images (or all nodes matching the passed selector(s))
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $transform
      * @param string|array $selector
      * @param array $imagerTransformDefaults
@@ -87,10 +87,10 @@ class RetconService extends Component
      * @return \Twig_Markup
      * @throws \craft\errors\AssetTransformException
      */
-    public function transform(string $html, $transform, $selector = 'img', array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
+    public function transform($html, $transform, $selector = 'img', array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -138,7 +138,7 @@ class RetconService extends Component
      * srcset
      * Creates a srcset attribute for all images (or all nodes matching the selector(s) passed) with the proper transforms
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $transforms
      * @param string|array $selector
      * @param string $sizes
@@ -147,10 +147,10 @@ class RetconService extends Component
      * @param array $configOverrides
      * @return \Twig_Markup
      */
-    public function srcset(string $html, $transforms, $selector = 'img', $sizes = '100w', $base64src = false, $transformDefaults = [], $configOverrides = [])
+    public function srcset($html, $transforms, $selector = 'img', $sizes = '100w', $base64src = false, $transformDefaults = [], $configOverrides = [])
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -231,16 +231,16 @@ class RetconService extends Component
      * lazy
      * Prepares all images (or all nodes matching the selector(s) passed) by swapping out the `src` attribute with a base64 encoded, transparent SVG. The original source will be retained in a data attribute
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @param string $className
      * @param string $attributeName
      * @return \Twig_Markup
      */
-    public function lazy(string $html, $selector = 'img', string $className = 'lazyload', string $attributeName = 'src')
+    public function lazy($html, $selector = 'img', string $className = 'lazyload', string $attributeName = 'src')
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -274,16 +274,16 @@ class RetconService extends Component
      * autoAlt
      * Attempts to auto-generate alternative text for all images (or all elements matching the $selector attribute).
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @param string $field
      * @param bool $overwrite
      * @return \Twig_Markup
      */
-    public function autoAlt(string $html, $selector = 'img', string $field = 'title', bool $overwrite = false)
+    public function autoAlt($html, $selector = 'img', string $field = 'title', bool $overwrite = false)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -318,16 +318,16 @@ class RetconService extends Component
      * attr
      * Adds (to) or replaces one or many attributes for one or many selectors
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @param array $attributes
      * @param bool $overwrite
      * @return \Twig_Markup
      */
-    public function attr(string $html, $selector, array $attributes, bool $overwrite = true)
+    public function attr($html, $selector, array $attributes, bool $overwrite = true)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -364,7 +364,7 @@ class RetconService extends Component
      * renameAttr
      * Renames attributes for matching selector(s)
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @param array $attributes
      * @return \Twig_Markup
@@ -372,7 +372,7 @@ class RetconService extends Component
     public function renameAttr($html, $selector, array $attributes)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -399,14 +399,14 @@ class RetconService extends Component
      * remove
      * Remove all elements matching given selector(s)
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @return \Twig_Markup
      */
     public function remove($html, $selector)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -426,14 +426,14 @@ class RetconService extends Component
      * only
      * Remove everything except nodes matching given selector(s)
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @return \Twig_Markup
      */
     public function only($html, $selector)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -464,7 +464,7 @@ class RetconService extends Component
      * change
      * Changes tag type/name for given selector(s). Can also remove tags (whilst retaining their contents) by passing `false` for the $toTag parameter
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @param string|bool $toTag
      * @return \Twig_Markup
@@ -472,7 +472,7 @@ class RetconService extends Component
     public function change($html, $selector, $toTag)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -516,7 +516,7 @@ class RetconService extends Component
      * wrap
      * Wraps all nodes matching the given selector(s) in a container
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @param string $container
      * @return \Twig_Markup
@@ -524,7 +524,7 @@ class RetconService extends Component
     public function wrap($html, $selector, $container)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -561,14 +561,14 @@ class RetconService extends Component
      * unwrap
      * Removes the parent of all nodes matching given selector(s), retaining all child nodes
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @return \Twig_Markup
      */
     public function unwrap($html, $selector)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -601,7 +601,7 @@ class RetconService extends Component
      * inject
      * Injects string value (could be HTML!) into all nodes matching given selector(s)
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @param string $toInject
      * @param bool $overwrite
@@ -610,7 +610,7 @@ class RetconService extends Component
     public function inject($html, $selector, $toInject, $overwrite = false)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 
@@ -665,14 +665,14 @@ class RetconService extends Component
      * removeEmpty
      * Removes empty nodes matching given selector(s), or all empty nodes if no selector
      *
-     * @param string $html
+     * @param string|null $html
      * @param string|array $selector
      * @return \Twig_Markup
      */
     public function removeEmpty($html, $selector = null)
     {
 
-        if (!$html) {
+        if (!$html = (string)$html) {
             return TemplateHelper::raw('');
         }
 

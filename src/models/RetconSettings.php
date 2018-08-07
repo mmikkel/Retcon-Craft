@@ -10,12 +10,12 @@ class RetconSettings extends Model
 {
 
     /**
-     * @var string
+     * @var string|null
      */
     public $baseTransformPath = '@webroot';
 
     /**
-     * @var string
+     * @var string|null
      */
     public $baseTransformUrl = '@web';
 
@@ -42,9 +42,18 @@ class RetconSettings extends Model
     public function init()
     {
         parent::init();
+
         $this->useImager = $this->useImager && Craft::$app->getPlugins()->getPlugin('imager');
-        $this->baseTransformPath = Craft::getAlias($this->baseTransformPath);
-        $this->baseTransformUrl = Craft::getAlias($this->baseTransformUrl);
+
+        $baseTransformPath = Craft::getAlias($this->baseTransformPath);
+        if ($baseTransformPath) {
+            $this->baseTransformPath = $baseTransformPath;
+        }
+
+        $baseTransformUrl = Craft::getAlias($this->baseTransformUrl);
+        if ($baseTransformUrl) {
+            $this->baseTransformUrl = $baseTransformUrl;
+        }
     }
 
 }
