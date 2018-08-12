@@ -321,10 +321,10 @@ class RetconService extends Component
      * @param string|null $html
      * @param string|array $selector
      * @param array $attributes
-     * @param bool $overwrite
+     * @param bool|string $overwrite Append values to existing attribute, rather than replacing the entire attribute. Can also be set to string "prepend" to prepend values to existing attribute rather than append
      * @return \Twig_Markup
      */
-    public function attr($html, $selector, array $attributes, bool $overwrite = true)
+    public function attr($html, $selector, array $attributes, $overwrite = true)
     {
 
         if (!$html = (string)$html) {
@@ -345,9 +345,13 @@ class RetconService extends Component
                     $node->setAttribute($key, '');
                 } else {
                     // Add attribute, either overwriting/replacing the old attribute values or just appending to it
-                    if (!$overwrite && $key !== 'id') {
+                    if ($overwrite !== true && $key !== 'id') {
                         $attributeValues = \explode(' ', $node->getAttribute($key));
-                        $attributeValues[] = $value;
+                        if ($overwrite === 'prepend') {
+                            $attributeValues = \array_merge([$value], $attributeValues);
+                        } else {
+                            $attributeValues[] = $value;
+                        }
                     } else {
                         $attributeValues = [$value];
                     }
