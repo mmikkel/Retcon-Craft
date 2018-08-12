@@ -1,5 +1,11 @@
 # Retcon Changelog
 
+## 2.0.8 - 2018-08-13
+### Fixed
+- Various minor issues ironed out (thanks, Scrutinizer)
+### Improved
+- The `overwrite` parameter for the `attr()` method can now be set to a string `'prepend'`, to _prepend_ rather than append values to existing attributes
+
 ## 2.0.7 - 2018-08-07
 ### Fixed
 - Fixes an issue where Retcon could throw an exception if given a NULL value instead of a string (e.g. if a Redactor field had been added to a Field Layout, without re-saving the entries)
