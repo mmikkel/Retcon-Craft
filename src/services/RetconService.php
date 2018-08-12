@@ -296,7 +296,6 @@ class RetconService extends Component
                 continue;
             }
             if ($overwrite || !$alt = $node->getAttribute('alt')) {
-                $alt = null;
                 $elementId = RetconHelper::getElementIdFromRef($src);
                 $element = $elementId ? Craft::$app->getElements()->getElementById($elementId) : null;
                 if ($element) {
@@ -644,7 +643,7 @@ class RetconService extends Component
 
                 if (isset($injectNode)) {
                     $node->appendChild($doc->importNode($injectNode->cloneNode(true), true));
-                } else {
+                } else if (isset($textNode)) {
                     $node->appendChild($textNode->cloneNode());
                 }
 
@@ -653,7 +652,7 @@ class RetconService extends Component
                 if (isset($injectNode)) {
                     $node->nodeValue = "";
                     $node->appendChild($doc->importNode($injectNode->cloneNode(true), true));
-                } else {
+                } else if ($toInject) {
                     $node->nodeValue = $toInject;
                 }
 

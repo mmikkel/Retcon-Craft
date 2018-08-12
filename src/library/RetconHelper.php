@@ -102,7 +102,7 @@ class RetconHelper
      * @param $transform
      * @param array $imagerTransformDefaults
      * @param array $imagerConfigOverrides
-     * @return object
+     * @return object|bool
      * @throws Exception
      * @throws \aelvan\imager\exceptions\ImagerException
      * @throws \craft\errors\ImageException
@@ -110,11 +110,19 @@ class RetconHelper
     public static function getTransformedImage(string $src, $transform, array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
     {
 
-        $imageUrl = Craft::$app->getElements()->parseRefs($src);
-        $imageUrlInfo = \parse_url($imageUrl);
-
         /** @var RetconSettings $settings */
         $settings = Retcon::$plugin->getSettings();
+
+        if (!$settings->baseTransformPath || !\is_string($settings->baseTransformPath)) {
+            throw new Exception('No base transform URL found in settings. Please add a valid path to the `baseTransformPath` setting in /config/retcon.php');
+        }
+
+        if (!$settings->baseTransformUrl || !\is_string($settings->baseTransformUrl)) {
+            throw new Exception('No base transform URL found in settings. Please add a valid URL to the `baseTransformUrl` setting in /config/retcon.php');
+        }
+
+        $imageUrl = Craft::$app->getElements()->parseRefs($src);
+        $imageUrlInfo = \parse_url($imageUrl);
 
         // If we can use Imager, we need to do minimal work
         if ($settings->useImager) {
@@ -151,8 +159,8 @@ class RetconHelper
         }
 
         // Get basepaths and URLs
-        $basePath = StringHelper::ensureRight($settings->baseTransformPath ?? '', '/');
-        $baseUrl = StringHelper::ensureRight($settings->baseTransformUrl ?? '', '/');
+        $basePath = StringHelper::ensureRight($settings->baseTransformPath, '/');
+        $baseUrl = StringHelper::ensureRight($settings->baseTransformUr, '/');
         $siteUrl = StringHelper::ensureRight(UrlHelper::siteUrl(), '/');
 
         $host = \parse_url($siteUrl, PHP_URL_HOST);
