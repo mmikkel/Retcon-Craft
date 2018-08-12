@@ -53,7 +53,7 @@ class RetconService extends Component
         }
         
         if (empty($args)) {
-            throw new Exception(Craft::t('No filter method or callbacks defined'));
+            throw new Exception('No filter method or callbacks defined');
         }
         
         $ops = \is_array($args[0]) ? $args[0] : [$args];
@@ -64,7 +64,7 @@ class RetconService extends Component
             $filter = \array_shift($args);
             
             if (!\method_exists($this, $filter)) {
-                throw new Exception(Craft::t('Undefined filter method {$filter}'));
+                throw new Exception('Undefined filter method {$filter}');
             }
             
             $html = \call_user_func_array([$this, $filter], \array_merge([$html], $args));
@@ -97,7 +97,7 @@ class RetconService extends Component
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
-        if (!$nodes) {
+        if (empty($nodes)) {
             return TemplateHelper::raw($html);
         }
 
@@ -141,7 +141,7 @@ class RetconService extends Component
      * @param string|null $html
      * @param string|array $transforms
      * @param string|array $selector
-     * @param string $sizes
+     * @param string|array $sizes
      * @param bool $base64src
      * @param array $transformDefaults
      * @param array $configOverrides
@@ -157,7 +157,7 @@ class RetconService extends Component
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
-        if (!$nodes) {
+        if (empty($nodes)) {
             return TemplateHelper::raw($html);
         }
 
@@ -179,8 +179,8 @@ class RetconService extends Component
         }
 
         // Get sizes attribute
-        if ($sizes) {
-            $sizes = !\is_array($sizes) ? [$sizes] : $sizes;
+        if ($sizes && \is_array($sizes)) {
+            $sizes = \implode(', ', $sizes);
         }
 
         /** @var \DOMElement $node */
@@ -207,7 +207,7 @@ class RetconService extends Component
 
             // Add sizes attribute
             if ($sizes) {
-                $node->setAttribute('sizes', \implode(', ', $sizes));
+                $node->setAttribute('sizes', $sizes);
             }
 
             $node->setAttribute('src', RetconHelper::parseRef($src));
@@ -444,7 +444,7 @@ class RetconService extends Component
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
-        if (!$nodes) {
+        if (empty($nodes)) {
             return TemplateHelper::raw($html);
         }
 
@@ -483,7 +483,7 @@ class RetconService extends Component
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
-        if (!$nodes) {
+        if (empty($nodes)) {
             return TemplateHelper::raw($html);
         }
 
@@ -535,7 +535,7 @@ class RetconService extends Component
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
-        if (!$nodes) {
+        if (empty($nodes)) {
             return TemplateHelper::raw($html);
         }
 
@@ -579,7 +579,7 @@ class RetconService extends Component
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
-        if (!$nodes) {
+        if (empty($nodes)) {
             return TemplateHelper::raw($html);
         }
 
@@ -621,7 +621,7 @@ class RetconService extends Component
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
-        if (!$nodes) {
+        if (empty($nodes)) {
             return TemplateHelper::raw($html);
         }
 
@@ -690,7 +690,9 @@ class RetconService extends Component
             }
         }
 
-        ($nodes ?? $dom)->filterXPath('//*[not(normalize-space())]', false)->each(function (Crawler $node) {
+        /** @var Crawler $crawler */
+        $crawler = $nodes ?? $dom->getCrawler();
+        $crawler->filterXPath('//*[not(normalize-space())]')->each(function (Crawler $node) {
             $node = $node->getNode(0);
             $node->parentNode->removeChild($node);
         });

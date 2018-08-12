@@ -86,9 +86,9 @@ class RetconHelper
 
             return $transform;
 
-        } else if (\is_array($transform)) {
+        } else {
 
-            // Template transform
+            // Array = template transform
             return $useImager ? $transform : Craft::$app->getAssetTransforms()->normalizeTransform($transform);
 
         }
@@ -96,12 +96,13 @@ class RetconHelper
         return null;
     }
 
+
     /**
      * @param string $src
      * @param $transform
      * @param array $imagerTransformDefaults
      * @param array $imagerConfigOverrides
-     * @return object|array|bool
+     * @return object
      * @throws Exception
      * @throws \aelvan\imager\exceptions\ImagerException
      * @throws \craft\errors\ImageException
@@ -150,8 +151,8 @@ class RetconHelper
         }
 
         // Get basepaths and URLs
-        $basePath = StringHelper::ensureRight($settings->baseTransformPath, '/');
-        $baseUrl = StringHelper::ensureRight($settings->baseTransformUrl, '/');
+        $basePath = StringHelper::ensureRight($settings->baseTransformPath ?? '', '/');
+        $baseUrl = StringHelper::ensureRight($settings->baseTransformUrl ?? '', '/');
         $siteUrl = StringHelper::ensureRight(UrlHelper::siteUrl(), '/');
 
         $host = \parse_url($siteUrl, PHP_URL_HOST);
@@ -197,15 +198,6 @@ class RetconHelper
 
             /** @var Image $image */
             $image = Craft::$app->getImages()->loadImage($imagePath);
-
-            if (!$image) {
-                if ($isDevMode) {
-                    throw new Exception(Craft::t('retcon', 'Unable to load image {path}', [
-                        'path' => $imagePath,
-                    ]));
-                }
-                return false;
-            }
 
             switch ($transformMode) {
                 case 'crop':
@@ -275,7 +267,7 @@ class RetconHelper
 
         $imageUrl = RetconHelper::parseRef($img->getAttribute('src'));
 
-        if (!$imageUrl) {
+        if (!((string)$imageUrl)) {
             return false;
         }
 
