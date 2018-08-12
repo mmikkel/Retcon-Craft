@@ -86,14 +86,10 @@ class RetconHelper
 
             return $transform;
 
-        } else {
-
-            // Array = template transform
-            return $useImager ? $transform : Craft::$app->getAssetTransforms()->normalizeTransform($transform);
-
         }
 
-        return null;
+        // Array = template transform
+        return $useImager ? $transform : Craft::$app->getAssetTransforms()->normalizeTransform($transform);
     }
 
 
@@ -160,7 +156,7 @@ class RetconHelper
 
         // Get basepaths and URLs
         $basePath = StringHelper::ensureRight($settings->baseTransformPath, '/');
-        $baseUrl = StringHelper::ensureRight($settings->baseTransformUr, '/');
+        $baseUrl = StringHelper::ensureRight($settings->baseTransformUrl, '/');
         $siteUrl = StringHelper::ensureRight(UrlHelper::siteUrl(), '/');
 
         $host = \parse_url($siteUrl, PHP_URL_HOST);

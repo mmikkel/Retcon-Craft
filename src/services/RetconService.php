@@ -295,13 +295,12 @@ class RetconService extends Component
             if (!$src = $node->getAttribute('src')) {
                 continue;
             }
-            if ($overwrite || !$alt = $node->getAttribute('alt')) {
+            if ($overwrite || !$node->getAttribute('alt')) {
                 $elementId = RetconHelper::getElementIdFromRef($src);
                 $element = $elementId ? Craft::$app->getElements()->getElementById($elementId) : null;
                 if ($element) {
                     $alt = @$element->$field ?: null;
-                }
-                if (!$alt) {
+                } else {
                     $imageSourcePathinfo = \pathinfo($src);
                     $alt = $imageSourcePathinfo['filename'] ?? '';
                 }
