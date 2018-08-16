@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.0.9 - 2018-08-16
+### Fixed
+- Fixes an issue where using Retcon on a string with only whitespace could throw an exception
+
 ## 2.0.8 - 2018-08-13
 ### Fixed
 - Various minor issues ironed out (thanks, Scrutinizer)
