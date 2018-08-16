@@ -689,7 +689,7 @@ class RetconService extends Component
      * Removes empty nodes matching given selector(s), or all empty nodes if no selector
      *
      * @param $html
-     * @param null $selector
+     * @param string|array $selector
      * @return null|string|\Twig_Markup
      */
     public function removeEmpty($html, $selector = null)
