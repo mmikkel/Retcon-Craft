@@ -37,6 +37,19 @@ class RetconHelper
     protected static $allowedTransformExtensions = ['jpg', 'png', 'gif'];
 
     /**
+     * @param $value
+     * @return null|string
+     */
+    public static function getHtmlFromParam($value)
+    {
+        $html = (string)$value;
+        if (!preg_replace('/\s+/', '', $value)) {
+            return null;
+        }
+        return $html;
+    }
+
+    /**
      * @param int $width
      * @param int $height
      * @return string

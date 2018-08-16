@@ -42,35 +42,35 @@ class RetconService extends Component
     /**
      * @param string|null $html
      * @param $args
-     * @return mixed
+     * @return null|string|\Twig_Markup
      * @throws Exception
      */
     public function retcon($html, ...$args)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
-        
+
         if (empty($args)) {
             throw new Exception('No filter method or callbacks defined');
         }
-        
+
         $ops = \is_array($args[0]) ? $args[0] : [$args];
-        
+
         foreach ($ops as $op) {
-            
+
             $args = \is_array($op) ? $op : [$op];
             $filter = \array_shift($args);
-            
+
             if (!\method_exists($this, $filter)) {
                 throw new Exception('Undefined filter method {$filter}');
             }
-            
+
             $html = \call_user_func_array([$this, $filter], \array_merge([$html], $args));
-            
+
         }
-        
+
         return $html;
 
     }
@@ -84,27 +84,27 @@ class RetconService extends Component
      * @param string|array $selector
      * @param array $imagerTransformDefaults
      * @param array $imagerConfigOverrides
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      * @throws \craft\errors\AssetTransformException
      */
     public function transform($html, $transform, $selector = 'img', array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $html;
         }
 
         $transform = RetconHelper::getImageTransform($transform);
 
         if (!$transform) {
-            return TemplateHelper::raw($html);
+            return $html;
         }
 
         /** @var \DOMElement $node */
@@ -145,20 +145,20 @@ class RetconService extends Component
      * @param bool $base64src
      * @param array $transformDefaults
      * @param array $configOverrides
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function srcset($html, $transforms, $selector = 'img', $sizes = '100w', $base64src = false, $transformDefaults = [], $configOverrides = [])
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $html;
         }
 
         // Get transforms
@@ -175,7 +175,7 @@ class RetconService extends Component
         }, []);
 
         if (empty($transforms)) {
-            return TemplateHelper::raw($html);
+            return $html;
         }
 
         // Get sizes attribute
@@ -235,17 +235,22 @@ class RetconService extends Component
      * @param string|array $selector
      * @param string $className
      * @param string $attributeName
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function lazy($html, $selector = 'img', string $className = 'lazyload', string $attributeName = 'src')
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
+
+        if (empty($nodes)) {
+            return $html;
+        }
+
         $attributeName = "data-{$attributeName}";
 
         /** @var \DOMElement $node */
@@ -278,17 +283,21 @@ class RetconService extends Component
      * @param string|array $selector
      * @param string $field
      * @param bool $overwrite
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function autoAlt($html, $selector = 'img', string $field = 'title', bool $overwrite = false)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
+
+        if (empty($nodes)) {
+            return $html;
+        }
 
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
@@ -320,17 +329,21 @@ class RetconService extends Component
      * @param string|array $selector
      * @param array $attributes
      * @param bool|string $overwrite Append values to existing attribute, rather than replacing the entire attribute. Can also be set to string "prepend" to prepend values to existing attribute rather than append
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function attr($html, $selector, array $attributes, $overwrite = true)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
+
+        if (empty($nodes)) {
+            return $html;
+        }
 
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
@@ -369,17 +382,21 @@ class RetconService extends Component
      * @param string|null $html
      * @param string|array $selector
      * @param array $attributes
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function renameAttr($html, $selector, array $attributes)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
+
+        if (empty($nodes)) {
+            return $html;
+        }
 
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
@@ -403,17 +420,21 @@ class RetconService extends Component
      *
      * @param string|null $html
      * @param string|array $selector
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function remove($html, $selector)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
+
+        if (empty($nodes)) {
+            return $html;
+        }
 
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
@@ -430,20 +451,20 @@ class RetconService extends Component
      *
      * @param string|null $html
      * @param string|array $selector
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function only($html, $selector)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $html;
         }
 
         $doc = $dom->getDoc();
@@ -469,20 +490,20 @@ class RetconService extends Component
      * @param string|null $html
      * @param string|array $selector
      * @param string|bool $toTag
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function change($html, $selector, $toTag)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $html;
         }
 
         $doc = $dom->getDoc();
@@ -521,20 +542,20 @@ class RetconService extends Component
      * @param string|null $html
      * @param string|array $selector
      * @param string $container
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function wrap($html, $selector, $container)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $html;
         }
 
         $doc = $dom->getDoc();
@@ -565,20 +586,20 @@ class RetconService extends Component
      *
      * @param string|null $html
      * @param string|array $selector
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function unwrap($html, $selector)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $html;
         }
 
         $doc = $dom->getDoc();
@@ -607,20 +628,20 @@ class RetconService extends Component
      * @param string|array $selector
      * @param string $toInject
      * @param bool $overwrite
-     * @return \Twig_Markup
+     * @return null|string|\Twig_Markup
      */
     public function inject($html, $selector, $toInject, $overwrite = false)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $html;
         }
 
         $doc = $dom->getDoc();
@@ -667,15 +688,15 @@ class RetconService extends Component
      * removeEmpty
      * Removes empty nodes matching given selector(s), or all empty nodes if no selector
      *
-     * @param string|null $html
-     * @param string|array $selector
-     * @return \Twig_Markup
+     * @param $html
+     * @param null $selector
+     * @return null|string|\Twig_Markup
      */
     public function removeEmpty($html, $selector = null)
     {
 
-        if (!$html = (string)$html) {
-            return TemplateHelper::raw('');
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
         }
 
         $dom = new RetconDom($html);
@@ -684,7 +705,7 @@ class RetconService extends Component
         if ($selector) {
             $nodes = $dom->filter($selector, false);
             if (!\count($nodes)) {
-                return TemplateHelper::raw($html);
+                return $html;
             }
         }
 
