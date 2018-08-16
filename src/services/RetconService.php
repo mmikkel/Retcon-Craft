@@ -98,7 +98,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $transform = RetconHelper::getImageTransform($transform);
@@ -158,7 +158,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         // Get transforms
@@ -248,7 +248,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $attributeName = "data-{$attributeName}";
@@ -296,7 +296,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         /** @var \DOMElement $node */
@@ -342,7 +342,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         /** @var \DOMElement $node */
@@ -395,7 +395,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         /** @var \DOMElement $node */
@@ -433,7 +433,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         /** @var \DOMElement $node */
@@ -464,7 +464,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $doc = $dom->getDoc();
@@ -503,7 +503,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $doc = $dom->getDoc();
@@ -555,7 +555,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $doc = $dom->getDoc();
@@ -599,7 +599,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $doc = $dom->getDoc();
@@ -641,7 +641,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         $doc = $dom->getDoc();
@@ -704,8 +704,8 @@ class RetconService extends Component
 
         if ($selector) {
             $nodes = $dom->filter($selector, false);
-            if (!\count($nodes)) {
-                return $html;
+            if (empty($nodes)) {
+                return TemplateHelper::raw($html);
             }
         }
 

@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.0.10 - 2018-08-17
+### Fixed
+- Fixes an issue where Retcon would return escaped HTML if no matching selectors were found
+
 ## 2.0.9 - 2018-08-16
 ### Fixed
 - Fixes an issue where using Retcon on a string with only whitespace could throw an exception
