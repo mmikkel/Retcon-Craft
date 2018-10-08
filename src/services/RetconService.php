@@ -472,8 +472,7 @@ class RetconService extends Component
 
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
-            $outerHtml = $node->ownerDocument->saveHTML($node);
-            $fragment->appendXML($outerHtml);
+            $fragment->appendChild($node);
         }
 
         $body = $doc->getElementsByTagName('body')->item(0);
