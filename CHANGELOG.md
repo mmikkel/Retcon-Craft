@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.0.11 - 2018-10-08
+### Fixed
+- Fixes an issue where the `retconOnly` filter could throw an exception if the HTML contained tags that weren't well-formed (e.g. `img` tags that aren't explicitly closed). Thanks a lot @jcdarwin!
+
 ## 2.0.10 - 2018-08-17
 ### Fixed
 - Fixes an issue where Retcon would return escaped HTML if no matching selectors were found
