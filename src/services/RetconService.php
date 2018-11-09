@@ -718,8 +718,12 @@ class RetconService extends Component
             $xpathQuery = '//*[not(self::br)][not(normalize-space())]';
         }
 
-        $crawler->filterXPath($xpathQuery)->each(function (Crawler $node) {
-            $node = $node->getNode(0);
+        $crawler->filterXPath($xpathQuery)->each(function (Crawler $crawler) {
+            /** @var \DOMNode $node */
+            $node = $crawler->getNode(0);
+            if (!($node instanceof \DOMNode)) {
+                return;
+            }
             $node->parentNode->removeChild($node);
         });
 
