@@ -719,9 +719,7 @@ class RetconService extends Component
         }
 
         $crawler->filterXPath($xpathQuery)->each(function (Crawler $crawler) {
-            /** @var \DOMNode $node */
-            $node = $crawler->getNode(0);
-            if (!($node instanceof \DOMNode)) {
+            if (!$node = $crawler->getNode(0)) {
                 return;
             }
             $node->parentNode->removeChild($node);
