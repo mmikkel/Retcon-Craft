@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.0.12 - 2018-11-09
+### Improved
+- The `retconRemoveEmpty` will no longer remove `<br/>` tags, unless the second parameter `$removeBr` is set to `true`
+
 ## 2.0.11 - 2018-10-08
 ### Fixed
 - Fixes an issue where the `retconOnly` filter could throw an exception if the HTML contained tags that weren't well-formed (e.g. `img` tags that aren't explicitly closed). Thanks a lot @jcdarwin!

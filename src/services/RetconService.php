@@ -689,9 +689,10 @@ class RetconService extends Component
      *
      * @param $html
      * @param string|array $selector
+     * @param bool $removeBr Remove <br /> tags or not
      * @return null|string|\Twig_Markup
      */
-    public function removeEmpty($html, $selector = null)
+    public function removeEmpty($html, $selector = null, $removeBr = false)
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
@@ -710,7 +711,14 @@ class RetconService extends Component
 
         /** @var Crawler $crawler */
         $crawler = $nodes ?? $dom->getCrawler();
-        $crawler->filterXPath('//*[not(normalize-space())]')->each(function (Crawler $node) {
+
+        if ($removeBr) {
+            $xpathQuery = '//*[not(normalize-space())]';
+        } else {
+            $xpathQuery = '//*[not(self::br)][not(normalize-space())]';
+        }
+
+        $crawler->filterXPath($xpathQuery)->each(function (Crawler $node) {
             $node = $node->getNode(0);
             $node->parentNode->removeChild($node);
         });
