@@ -217,9 +217,9 @@ class RetconService extends Component
                 continue;
             }
 
-            $dimensions = RetconHelper::getImageDimensions($node);
-            $width = $dimensions ? $dimensions['width'] : null;
-            $height = $dimensions ? $dimensions['height'] : null;
+            $dimensions = RetconHelper::getImageDimensions($node) ?? [];
+            $width = $dimensions['width'] ?? null;
+            $height = $dimensions['height'] ?? null;
             $node->setAttribute('src', RetconHelper::getBase64Pixel($width, $height));
         }
 
@@ -259,16 +259,22 @@ class RetconService extends Component
             $imageClasses = \explode(' ', $node->getAttribute('class'));
             $imageClasses[] = $className;
 
-            $dimensions = RetconHelper::getImageDimensions($node);
-
-            $width = $dimensions ? $dimensions['width'] : null;
-            $height = $dimensions ? $dimensions['height'] : null;
-
             $node->setAttribute('class', \trim(\implode(' ', $imageClasses)));
             $node->setAttribute($attributeName, RetconHelper::parseRef($node->getAttribute('src')));
+
+            $dimensions = RetconHelper::getImageDimensions($node) ?? [];
+            $width = $dimensions['width'] ?? null;
+            $height = $dimensions['height'] ?? null;
+
             $node->setAttribute('src', RetconHelper::getBase64Pixel($width, $height));
-            $node->setAttribute('width', $width);
-            $node->setAttribute('height', $height);
+
+            if ($width) {
+                $node->setAttribute('width', $width);
+            }
+
+            if ($height) {
+                $node->setAttribute('height', $height);
+            }
         }
 
         return $dom->getHtml();

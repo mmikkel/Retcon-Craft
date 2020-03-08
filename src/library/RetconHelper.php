@@ -266,8 +266,8 @@ class RetconHelper
 
     /**
      * @param \DOMNode $img
-     * @return array|bool|null
-     * @throws \yii\base\Exception
+     * @return array|null
+     * @throws Exception
      */
     public static function getImageDimensions(\DOMNode $img)
     {
@@ -284,25 +284,30 @@ class RetconHelper
 
         $imageUrl = RetconHelper::parseRef($img->getAttribute('src'));
 
-        if (!((string)$imageUrl)) {
-            return false;
+        if (!((string)$imageUrl) || !\filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+            return null;
         }
 
         /** @var RetconSettings $settings */
         $settings = Retcon::$plugin->getSettings();
-
         $basePath = $settings->baseTransformPath;
         $siteUrl = UrlHelper::siteUrl();
         $host = \parse_url($siteUrl, PHP_URL_HOST);
-        $imageUrlInfo = \parse_url($imageUrl);
-        $imagePath = self::fixSlashes($basePath . $imageUrlInfo['path']);
-        $imageIsLocal = !(isset($imageUrlInfo['host']) && $imageUrlInfo['host'] !== $host);
 
-        if (!$imageIsLocal || !\file_exists($imagePath)) {
+        $imageUrlInfo = \parse_url($imageUrl);
+        $imagePath = $imageUrlInfo['path'] ?? null;
+        if (!$imagePath) {
             return null;
         }
 
-        list($width, $height) = \getimagesize($imagePath);
+        $imageAbsolutePath = self::fixSlashes($basePath . '/' . $imagePath);
+        $imageIsLocal = !(isset($imageUrlInfo['host']) && $imageUrlInfo['host'] !== $host);
+
+        if (!$imageIsLocal || (!\file_exists($imageAbsolutePath) || \is_dir($imageAbsolutePath))) {
+            return null;
+        }
+
+        list($width, $height) = \getimagesize($imageAbsolutePath);
 
         return [
             'width' => $width,
