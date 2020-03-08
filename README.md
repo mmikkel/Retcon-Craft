@@ -155,24 +155,9 @@ Multiple selectors can be defined as a comma-separated string (i.e. `'p, span'`)
 
 ### Methods
 
-**NOTE/TODO: The Wiki is written for the v. 1.x branch and hasn't been updated yet. No biggie, basically all methods will work the same as before, except for the `lazy`, `transform` and `srcset` methods which have been granted an additional parameter `$selector` (third parameter for `transform` and `srcset`; second parameter for `lazy`).  **
-
-**Also, a wiki for the `removeEmpty` method hasn't been created yet, but it looks like this:**  
-
-```twig
-{{ entry.body | retconRemoveEmpty }}
-```
-
-to remove all empty nodes, or
-
-```twig
-{{ entry.body | retconRemoveEmpty('p') }}
-```
-
-to just remove empty paragraph tags.  
-
 **[transform](https://github.com/mmikkel/Retcon-Craft/wiki/Transform)**
-Apply a named or inline image transform to all images. **If installed, Retcon uses [Imager](https://github.com/aelvan/Imager-Craft) to apply the transform.**  
+Apply a named or inline image transform to all images. **If installed, Retcon uses [Imager](https://github.com/aelvan/Imager-Craft) to apply the transform.**
+**New:** Retcon also supports Imager's successor, [Imager X](https://github.com/spacecatninja/craft-imager-x).
 
 **[srcset](https://github.com/mmikkel/Retcon-Craft/wiki/srcset)**
 Apply an array of named or inline image transform to all images, for simple srcset support. **If installed, Retcon uses [Imager](https://github.com/aelvan/Imager-Craft) to apply the transforms.**  
