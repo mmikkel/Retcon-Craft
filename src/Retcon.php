@@ -36,7 +36,6 @@ use yii\base\Event;
  *
  * @property  RetconService $retcon
  * @property  Settings $settings
- * @method    Settings getSettings()
  */
 class Retcon extends Plugin
 {

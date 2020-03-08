@@ -8,11 +8,11 @@
 
 namespace mmikkel\retcon\library;
 
+use aelvan\imager\Imager;
+use spacecatninja\imagerx\ImagerX;
+
 use mmikkel\retcon\models\RetconSettings;
 use mmikkel\retcon\Retcon;
-
-use Symfony\Component\DomCrawler\Crawler;
-use Masterminds\HTML5;
 
 use Craft;
 use craft\base\Image;
@@ -67,9 +67,9 @@ class RetconHelper
     public static function getImageTransform($transform)
     {
 
-        /** @var RetconSettings $settings */
-        $settings = Retcon::$plugin->getSettings();
-        $useImager = $settings->useImager;
+        /** @var Imager|ImagerX $imagerPlugin */
+        $imagerPlugin = RetconHelper::getImagerPlugin();
+        $useImager = !!$imagerPlugin;
 
         if (\is_string($transform)) {
 
@@ -101,8 +101,11 @@ class RetconHelper
 
         }
 
-        // Array = template transform
-        return $useImager ? $transform : Craft::$app->getAssetTransforms()->normalizeTransform($transform);
+        if ($useImager) {
+            return $transform;
+        }
+
+        return Craft::$app->getAssetTransforms()->normalizeTransform($transform);
     }
 
 
@@ -134,13 +137,13 @@ class RetconHelper
         $imageUrlInfo = \parse_url($imageUrl);
 
         // If we can use Imager, we need to do minimal work
-        if ($settings->useImager) {
-            /** @var \aelvan\imager\Imager $imagerPlugin */
-            $imagerPlugin = Craft::$app->plugins->getPlugin('imager');
+        /** @var Imager $imagerPlugin */
+        $imagerPlugin = self::getImagerPlugin();
+        if ($imagerPlugin) {
             return $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults, $imagerConfigOverrides);
         }
 
-        $transform = (object) $transform;
+        $transform = (object)$transform;
 
         // Normalize the transform
         $transformWidth = $transform->width ?? 'AUTO';
@@ -282,9 +285,8 @@ class RetconHelper
             ];
         }
 
-        $imageUrl = RetconHelper::parseRef($img->getAttribute('src'));
-
-        if (!((string)$imageUrl) || !\filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+        $imageUrl = (string)RetconHelper::parseRef($img->getAttribute('src'));
+        if (!$imageUrl) {
             return null;
         }
 
@@ -300,10 +302,13 @@ class RetconHelper
             return null;
         }
 
-        $imageAbsolutePath = self::fixSlashes($basePath . '/' . $imagePath);
         $imageIsLocal = !(isset($imageUrlInfo['host']) && $imageUrlInfo['host'] !== $host);
+        if (!$imageIsLocal) {
+            return null;
+        }
 
-        if (!$imageIsLocal || (!\file_exists($imageAbsolutePath) || \is_dir($imageAbsolutePath))) {
+        $imageAbsolutePath = self::fixSlashes($basePath . '/' . $imagePath);
+        if (!\file_exists($imageAbsolutePath) || \is_dir($imageAbsolutePath)) {
             return null;
         }
 
@@ -368,7 +373,8 @@ class RetconHelper
 
     /**
      * @param string $value
-     * @return \Twig_Markup
+     * @return \Twig\Markup|\Twig_Markup
+     * @throws \craft\errors\SiteNotFoundException
      */
     public static function parseRef(string $value)
     {
@@ -389,6 +395,20 @@ class RetconHelper
             return null;
         }
         return $id;
+    }
+
+    /**
+     * @return Imager|ImagerX|null
+     */
+    public static function getImagerPlugin()
+    {
+        /** @var RetconSettings $settings */
+        $settings = Retcon::$plugin->getSettings();
+        if (!$settings->useImager) {
+            return null;
+        }
+        $pluginsService = Craft::$app->getPlugins();
+        return $pluginsService->getPlugin('imager') ?? $pluginsService->getPlugin('imager-x');
     }
 
 }

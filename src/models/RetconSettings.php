@@ -42,14 +42,10 @@ class RetconSettings extends Model
     public function init()
     {
         parent::init();
-
-        $this->useImager = $this->useImager && Craft::$app->getPlugins()->getPlugin('imager');
-
         $baseTransformPath = Craft::getAlias($this->baseTransformPath);
         if ($baseTransformPath) {
             $this->baseTransformPath = $baseTransformPath;
         }
-
         $baseTransformUrl = Craft::getAlias($this->baseTransformUrl);
         if ($baseTransformUrl) {
             $this->baseTransformUrl = $baseTransformUrl;
