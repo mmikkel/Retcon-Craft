@@ -10,6 +10,7 @@
 
 namespace mmikkel\retcon\services;
 
+use craft\base\Element;
 use mmikkel\retcon\Retcon;
 use mmikkel\retcon\library\RetconDom;
 use mmikkel\retcon\library\RetconHelper;
@@ -281,9 +282,11 @@ class RetconService extends Component
 
     }
 
+    // Attempts to auto-generate alternative text for all images (or all elements matching the $selector attribute).
+
     /**
      * autoAlt
-     * Attempts to auto-generate alternative text for all images (or all elements matching the $selector attribute).
+     *
      *
      * @param string|null $html
      * @param string|array $selector
@@ -294,7 +297,7 @@ class RetconService extends Component
     public function autoAlt($html, $selector = 'img', string $field = 'title', bool $overwrite = false)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+        if (!RetconHelper::getHtmlFromParam($html)) {
             return $html;
         }
 
@@ -312,10 +315,13 @@ class RetconService extends Component
             }
             if ($overwrite || !$node->getAttribute('alt')) {
                 $elementId = RetconHelper::getElementIdFromRef($src);
+                /** @var Element $element */
                 $element = $elementId ? Craft::$app->getElements()->getElementById($elementId) : null;
+                $alt = null;
                 if ($element) {
-                    $alt = @$element->$field ?: null;
-                } else {
+                    $alt = $element->$field ?: $element->title ?: null;
+                }
+                if (!$alt) {
                     $imageSourcePathinfo = \pathinfo($src);
                     $alt = $imageSourcePathinfo['filename'] ?? '';
                 }

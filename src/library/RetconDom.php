@@ -9,7 +9,8 @@
 namespace mmikkel\retcon\library;
 
 use Craft;
-use craft\helpers\Template as TemplateHelper;
+use craft\helpers\Template;
+use craft\redactor\FieldData;
 
 use Masterminds\HTML5;
 use Symfony\Component\DomCrawler\Crawler;
@@ -40,6 +41,9 @@ class RetconDom
      */
     public function __construct($html)
     {
+        if ($html instanceof FieldData && $rawContent = $html->getRawContent()) {
+            $html = $rawContent;
+        }
         $libxmlUseInternalErrors = \libxml_use_internal_errors(true);
         $this->stripDoctype = !\preg_match('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', $html);
         $this->html5 = new HTML5([
@@ -103,7 +107,8 @@ class RetconDom
     }
 
     /**
-     * @return \Twig_Markup
+     * @return \Twig\Markup|\Twig_Markup
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function getHtml()
     {
@@ -111,7 +116,7 @@ class RetconDom
         if ($this->stripDoctype) {
             $html = \html_entity_decode(\preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html), ENT_NOQUOTES);
         }
-        return TemplateHelper::raw($html);
+        return Template::raw(Craft::$app->getElements()->parseRefs((string)$html));
     }
 
 }
