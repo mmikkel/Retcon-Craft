@@ -1,5 +1,12 @@
 # Retcon Changelog
 
+## 2.1.0 - 2020-03-08
+### Added
+- Adds support for Imager X
+### Fixed
+- Fixes an issue where the `retconAutoAlt` filter would always use the image filename for the `alt` attribute
+- Fixes an issue where Retcon would throw an exception if the `retconLazy` filter was used on an `<img>` tag with an invalid `src` attribute
+
 ## 2.0.12 - 2018-11-09
 ### Improved
 - The `retconRemoveEmpty` will no longer remove `<br/>` tags, unless the second parameter `$removeBr` is set to `true`
