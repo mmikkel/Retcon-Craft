@@ -41,9 +41,9 @@ class RetconService extends Component
 {
 
     /**
-     * @param string|null $html
-     * @param $args
-     * @return null|string|\Twig_Markup
+     * @param $html
+     * @param mixed ...$args
+     * @return mixed|string|null
      * @throws Exception
      */
     public function retcon($html, ...$args)
@@ -77,16 +77,19 @@ class RetconService extends Component
     }
 
     /**
-     * transform
      * Applies an image transform to all images (or all nodes matching the passed selector(s))
      *
-     * @param string|null $html
-     * @param string|array $transform
-     * @param string|array $selector
+     * @param $html
+     * @param $transform
+     * @param string $selector
      * @param array $imagerTransformDefaults
      * @param array $imagerConfigOverrides
-     * @return null|string|\Twig_Markup
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws Exception
+     * @throws \aelvan\imager\exceptions\ImagerException
      * @throws \craft\errors\AssetTransformException
+     * @throws \craft\errors\ImageException
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function transform($html, $transform, $selector = 'img', array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
     {
@@ -136,17 +139,18 @@ class RetconService extends Component
     }
 
     /**
-     * srcset
      * Creates a srcset attribute for all images (or all nodes matching the selector(s) passed) with the proper transforms
      *
-     * @param string|null $html
-     * @param string|array $transforms
-     * @param string|array $selector
-     * @param string|array $sizes
+     * @param $html
+     * @param $transforms
+     * @param string $selector
+     * @param string $sizes
      * @param bool $base64src
      * @param array $transformDefaults
      * @param array $configOverrides
-     * @return null|string|\Twig_Markup
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws Exception
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function srcset($html, $transforms, $selector = 'img', $sizes = '100w', $base64src = false, $transformDefaults = [], $configOverrides = [])
     {
@@ -229,14 +233,15 @@ class RetconService extends Component
     }
 
     /**
-     * lazy
      * Prepares all images (or all nodes matching the selector(s) passed) by swapping out the `src` attribute with a base64 encoded, transparent SVG. The original source will be retained in a data attribute
      *
-     * @param string|null $html
-     * @param string|array $selector
+     * @param $html
+     * @param string $selector
      * @param string $className
      * @param string $attributeName
-     * @return null|string|\Twig_Markup
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws Exception
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function lazy($html, $selector = 'img', string $className = 'lazyload', string $attributeName = 'src')
     {
@@ -282,17 +287,15 @@ class RetconService extends Component
 
     }
 
-    // Attempts to auto-generate alternative text for all images (or all elements matching the $selector attribute).
-
     /**
-     * autoAlt
+     * Attempts to auto-generate alternative text for all images (or all elements matching the $selector attribute).
      *
-     *
-     * @param string|null $html
-     * @param string|array $selector
+     * @param $html
+     * @param string $selector
      * @param string $field
      * @param bool $overwrite
-     * @return null|string|\Twig_Markup
+     * @return \Twig\Markup|\Twig_Markup
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function autoAlt($html, $selector = 'img', string $field = 'title', bool $overwrite = false)
     {
@@ -334,14 +337,14 @@ class RetconService extends Component
     }
 
     /**
-     * attr
      * Adds (to) or replaces one or many attributes for one or many selectors
      *
-     * @param string|null $html
-     * @param string|array $selector
+     * @param $html
+     * @param $selector
      * @param array $attributes
-     * @param bool|string $overwrite Append values to existing attribute, rather than replacing the entire attribute. Can also be set to string "prepend" to prepend values to existing attribute rather than append
-     * @return null|string|\Twig_Markup
+     * @param bool $overwrite
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function attr($html, $selector, array $attributes, $overwrite = true)
     {
@@ -388,13 +391,13 @@ class RetconService extends Component
     }
 
     /**
-     * renameAttr
      * Renames attributes for matching selector(s)
      *
-     * @param string|null $html
-     * @param string|array $selector
+     * @param $html
+     * @param $selector
      * @param array $attributes
-     * @return null|string|\Twig_Markup
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function renameAttr($html, $selector, array $attributes)
     {
@@ -427,12 +430,12 @@ class RetconService extends Component
     }
 
     /**
-     * remove
      * Remove all elements matching given selector(s)
      *
-     * @param string|null $html
-     * @param string|array $selector
-     * @return null|string|\Twig_Markup
+     * @param $html
+     * @param $selector
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function remove($html, $selector)
     {
@@ -458,12 +461,12 @@ class RetconService extends Component
     }
 
     /**
-     * only
      * Remove everything except nodes matching given selector(s)
      *
-     * @param string|null $html
-     * @param string|array $selector
-     * @return null|string|\Twig_Markup
+     * @param $html
+     * @param $selector
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function only($html, $selector)
     {
@@ -495,13 +498,13 @@ class RetconService extends Component
     }
 
     /**
-     * change
      * Changes tag type/name for given selector(s). Can also remove tags (whilst retaining their contents) by passing `false` for the $toTag parameter
      *
-     * @param string|null $html
-     * @param string|array $selector
-     * @param string|bool $toTag
-     * @return null|string|\Twig_Markup
+     * @param $html
+     * @param $selector
+     * @param $toTag
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function change($html, $selector, $toTag)
     {
@@ -547,13 +550,13 @@ class RetconService extends Component
     }
 
     /**
-     * wrap
      * Wraps all nodes matching the given selector(s) in a container
      *
-     * @param string|null $html
-     * @param string|array $selector
-     * @param string $container
-     * @return null|string|\Twig_Markup
+     * @param $html
+     * @param $selector
+     * @param $container
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function wrap($html, $selector, $container)
     {
@@ -592,12 +595,12 @@ class RetconService extends Component
     }
 
     /**
-     * unwrap
      * Removes the parent of all nodes matching given selector(s), retaining all child nodes
      *
-     * @param string|null $html
-     * @param string|array $selector
-     * @return null|string|\Twig_Markup
+     * @param $html
+     * @param $selector
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function unwrap($html, $selector)
     {
@@ -632,14 +635,14 @@ class RetconService extends Component
     }
 
     /**
-     * inject
      * Injects string value (could be HTML!) into all nodes matching given selector(s)
      *
-     * @param string|null $html
-     * @param string|array $selector
-     * @param string $toInject
+     * @param $html
+     * @param $selector
+     * @param $toInject
      * @param bool $overwrite
-     * @return null|string|\Twig_Markup
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function inject($html, $selector, $toInject, $overwrite = false)
     {
@@ -696,13 +699,13 @@ class RetconService extends Component
     }
 
     /**
-     * removeEmpty
      * Removes empty nodes matching given selector(s), or all empty nodes if no selector
      *
      * @param $html
-     * @param string|array $selector
-     * @param bool $removeBr Remove <br /> tags or not
-     * @return null|string|\Twig_Markup
+     * @param null $selector
+     * @param bool $removeBr
+     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function removeEmpty($html, $selector = null, $removeBr = false)
     {
