@@ -45,13 +45,13 @@ class RetconDom
             $html = $rawContent;
         }
         $libxmlUseInternalErrors = \libxml_use_internal_errors(true);
-        $this->stripDoctype = !\preg_match('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', $html);
+        $content = \mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset());
+        $this->doc = new \DOMDocument();
+        $this->doc->loadHTML("<html>$content</html>", LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $this->crawler = new Crawler($this->doc);
         $this->html5 = new HTML5([
             'encode_entities' => false,
         ]);
-        $this->doc = new \DOMDocument();
-        $this->doc->loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset()));
-        $this->crawler = new Crawler($this->doc);
         \libxml_use_internal_errors($libxmlUseInternalErrors);
     }
 
@@ -113,9 +113,7 @@ class RetconDom
     public function getHtml()
     {
         $html = $this->html5->saveHTML($this->doc);
-        if ($this->stripDoctype) {
-            $html = \preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html);
-        }
+        $html = \preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html);
         return Template::raw(Craft::$app->getElements()->parseRefs((string)$html));
     }
 
