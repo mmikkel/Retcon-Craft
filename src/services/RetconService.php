@@ -243,7 +243,7 @@ class RetconService extends Component
      * @throws Exception
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function lazy($html, $selector = 'img', string $className = 'lazyload', string $attributeName = 'src')
+    public function lazy($html, $selector = 'img', $className = 'lazyload', $attributeName = 'src')
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
@@ -297,7 +297,7 @@ class RetconService extends Component
      * @return \Twig\Markup|\Twig_Markup
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function autoAlt($html, $selector = 'img', string $field = 'title', bool $overwrite = false)
+    public function autoAlt($html, $selector = 'img', $field = 'title', $overwrite = false)
     {
 
         if (!RetconHelper::getHtmlFromParam($html)) {

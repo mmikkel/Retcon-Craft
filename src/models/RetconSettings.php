@@ -39,15 +39,18 @@ class RetconSettings extends Model
         $this->init();
     }
 
+    /**
+     *
+     */
     public function init()
     {
         parent::init();
         $baseTransformPath = Craft::parseEnv($this->baseTransformPath);
-        if ($baseTransformPath) {
+        if ($baseTransformPath && \is_string($baseTransformPath)) {
             $this->baseTransformPath = $baseTransformPath;
         }
         $baseTransformUrl = Craft::parseEnv($this->baseTransformUrl);
-        if ($baseTransformUrl) {
+        if ($baseTransformUrl && \is_string($baseTransformUrl)) {
             $this->baseTransformUrl = $baseTransformUrl;
         }
     }
