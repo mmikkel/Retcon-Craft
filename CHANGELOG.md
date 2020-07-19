@@ -1,6 +1,6 @@
 # Retcon Changelog
 
-## Unreleased
+## 2.2.1 - 2020-07-19
 ### Fixed
 - Fixes an issue where the `retconOnly` filter could throw an exception  
 ### Improved
