@@ -5,6 +5,8 @@
 - Fixes an issue where the `retconOnly` filter could throw an exception  
 ### Improved
 - The `retconOnly` filter now returns an empty string if there are no nodes matching the selector  
+### Changed  
+- Retcon now uses caret version range for the DomCrawler and CssSelector components  
 
 ## 2.2.0 - 2020-07-19
 ### Fixed
