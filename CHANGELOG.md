@@ -1,6 +1,6 @@
 # Retcon Changelog
 
-## Unreleased
+## 2.2.0 - 2020-07-19
 ### Fixed
 - Fixes an issue where using the `retconAttr` filter on `<script>` tags could result in invalid HTML. Fixes #25  
 - Retcon no longer decodes HTML entities, fixing an issue where particular characters could result in mangled content output. Fixes #24  
