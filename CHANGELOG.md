@@ -1,5 +1,11 @@
 # Retcon Changelog
 
+## Unreleased
+### Fixed
+- Fixes an issue where the `retconOnly` filter could throw an exception  
+### Improved
+- The `retconOnly` filter now returns an empty string if there are no nodes matching the selector  
+
 ## 2.2.0 - 2020-07-19
 ### Fixed
 - Fixes an issue where using the `retconAttr` filter on `<script>` tags could result in invalid HTML. Fixes #25  

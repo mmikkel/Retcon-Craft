@@ -479,7 +479,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return TemplateHelper::raw('');
         }
 
         $doc = $dom->getDoc();
@@ -490,8 +490,7 @@ class RetconService extends Component
             $fragment->appendChild($node);
         }
 
-        $body = $doc->getElementsByTagName('body')->item(0);
-        $body->parentNode->replaceChild($fragment, $body);
+        $doc->firstChild->parentNode->replaceChild($fragment, $doc->firstChild);
 
         return $dom->getHtml();
 
