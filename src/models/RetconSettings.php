@@ -10,12 +10,12 @@ class RetconSettings extends Model
 {
 
     /**
-     * @var string|bool|null
+     * @var string|null
      */
     public $baseTransformPath = '@webroot';
 
     /**
-     * @var string|bool|null
+     * @var string|null
      */
     public $baseTransformUrl = '@web';
 
