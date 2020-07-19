@@ -24,8 +24,8 @@
     "require": {
         "craftcms/cms": "^3.0.0-RC1",
         "masterminds/html5": "^2.3",
-        "symfony/dom-crawler": "3.3.6",
-        "symfony/css-selector": "3.3.6"
+        "symfony/dom-crawler": "^3.3.6",
+        "symfony/css-selector": "^3.3.6"
     },
     "repositories": [
         {
