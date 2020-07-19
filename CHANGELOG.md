@@ -1,5 +1,10 @@
 # Retcon Changelog
 
+## Unreleased
+### Fixed
+- Fixes an issue where using the `retconAttr` filter on `<script>` tags could result in invalid HTML. Fixes #25  
+- Retcon no longer decodes HTML entities, fixing an issue where particular characters could result in mangled content output. Fixes #24  
+ 
 ## 2.1.0 - 2020-03-08
 ### Added
 - Adds support for Imager X
