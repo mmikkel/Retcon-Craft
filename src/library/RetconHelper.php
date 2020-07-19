@@ -16,6 +16,7 @@ use mmikkel\retcon\Retcon;
 
 use Craft;
 use craft\base\Image;
+use craft\base\PluginInterface;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use craft\helpers\Template as TemplateHelper;
@@ -31,6 +32,7 @@ class RetconHelper
      * @var array
      */
     protected static $transforms = [];
+
     /**
      * @var array
      */
@@ -43,7 +45,7 @@ class RetconHelper
     public static function getHtmlFromParam($value)
     {
         $html = (string)$value;
-        if (!preg_replace('/\s+/', '', $value)) {
+        if (!\preg_replace('/\s+/', '', $value)) {
             return null;
         }
         return $html;
@@ -67,7 +69,7 @@ class RetconHelper
     public static function getImageTransform($transform)
     {
 
-        /** @var Imager|ImagerX $imagerPlugin */
+        /** @var Imager|ImagerX|PluginInterface $imagerPlugin */
         $imagerPlugin = RetconHelper::getImagerPlugin();
         $useImager = !!$imagerPlugin;
 

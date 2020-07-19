@@ -144,7 +144,7 @@ class RetconService extends Component
      * @param $html
      * @param $transforms
      * @param string $selector
-     * @param string $sizes
+     * @param string|array $sizes
      * @param bool $base64src
      * @param array $transformDefaults
      * @param array $configOverrides
@@ -701,7 +701,7 @@ class RetconService extends Component
      * Removes empty nodes matching given selector(s), or all empty nodes if no selector
      *
      * @param $html
-     * @param null $selector
+     * @param $selector
      * @param bool $removeBr
      * @return string|\Twig\Markup|\Twig_Markup|null
      * @throws \craft\errors\SiteNotFoundException
