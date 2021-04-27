@@ -182,7 +182,7 @@ class RetconHelper
         $imagePathInfo = \pathinfo($imageUrlInfo['path'] ?? '');
 
         // Check extension
-        if (!\in_array(\strtolower($imagePathInfo['extension']), self::$allowedTransformExtensions)) {
+        if (!isset($imagePathInfo['extension']) || !\in_array(\strtolower($imagePathInfo['extension']), self::$allowedTransformExtensions)) {
             return false;
         }
 
