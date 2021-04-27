@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.2.2 - 2020-04-27
+### Fixed
+- Fixes an issue where an exception could be thrown if Retcon was unable to read the extension for a transformed image. Thanks @lenvanessen! Fixes #31  
+
 ## 2.2.1 - 2020-07-19
 ### Fixed
 - Fixes an issue where the `retconOnly` filter could throw an exception  
