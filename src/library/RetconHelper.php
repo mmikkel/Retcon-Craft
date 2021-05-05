@@ -36,7 +36,7 @@ class RetconHelper
     /**
      * @var array
      */
-    protected static $allowedTransformExtensions = ['jpg', 'png', 'gif'];
+    protected static $allowedTransformExtensions = ['jpg', 'jpeg', 'png', 'gif'];
 
     /**
      * @param $value
