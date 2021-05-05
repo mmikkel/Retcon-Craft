@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.2.3 - 2020-05-05  
+### Fixed  
+- Fixes an issue where Retcon wouldn't transform images with a `jpeg` file extension. Thanks @sweetroll 👍  
+
 ## 2.2.2 - 2020-04-27
 ### Fixed
 - Fixes an issue where an exception could be thrown if Retcon was unable to read the extension for a transformed image. Thanks @lenvanessen! Fixes #31  
