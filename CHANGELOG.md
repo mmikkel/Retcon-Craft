@@ -1,5 +1,11 @@
 # Retcon Changelog
 
+## 2.3.0 - 2021-10-22  
+### Changed  
+- Update version dependencies for `symfony/dom-crawler` and `symfony/css-selector`.
+### Fixed  
+- Fixed docs (closes #28)
+
 ## 2.2.3 - 2020-05-05  
 ### Fixed  
 - Fixes an issue where Retcon wouldn't transform images with a `jpeg` file extension. Thanks @sweetroll 👍  
