@@ -1,5 +1,12 @@
 # Retcon Changelog
 
+## Unreleased
+### Added
+- Added support for Craft 4.0
+
+### Changed
+- Retcon now requires Craft 3.7.x
+
 ## 2.3.0 - 2021-10-22  
 ### Changed  
 - Update version dependencies for `symfony/dom-crawler` and `symfony/css-selector`.
