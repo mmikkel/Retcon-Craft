@@ -3,7 +3,7 @@
 ## Unreleased
 ### Added
 - Added support for Craft 4.0
-- Added support for Imager X named transforms
+- Added support for Imager X named transforms  
 
 ### Fixed
 - Fixed a couple of instances where Retcon could return unescaped HTML  

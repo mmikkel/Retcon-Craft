@@ -19,6 +19,7 @@ use Craft;
 use craft\base\Image;
 use craft\base\PluginInterface;
 use craft\helpers\FileHelper;
+use craft\helpers\Image as ImageHelper;
 use craft\helpers\StringHelper;
 use craft\helpers\Template as TemplateHelper;
 use craft\helpers\UrlHelper;
@@ -33,11 +34,6 @@ class RetconHelper
      * @var array
      */
     protected static $transforms = [];
-
-    /**
-     * @var array
-     */
-    protected static $allowedTransformExtensions = ['jpg', 'jpeg', 'png', 'gif'];
 
     /**
      * @param $value
@@ -189,7 +185,8 @@ class RetconHelper
         $imagePathInfo = \pathinfo($imageUrlInfo['path'] ?? '');
 
         // Check extension
-        if (!isset($imagePathInfo['extension']) || !\in_array(\strtolower($imagePathInfo['extension']), self::$allowedTransformExtensions)) {
+        $allowedExtensions = ImageHelper::webSafeFormats();
+        if (!isset($imagePathInfo['extension']) || !\in_array(\strtolower($imagePathInfo['extension']), $allowedExtensions)) {
             return false;
         }
 
