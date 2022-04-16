@@ -24,7 +24,7 @@ use mmikkel\retcon\services\RetconService;
  * @package   Retcon
  * @since     1.0.0
  */
-class RetconTwigExtension extends \Twig_Extension
+class RetconTwigExtension extends \Twig\Extension\AbstractExtension
 {
     /**
      * @return string
@@ -35,7 +35,7 @@ class RetconTwigExtension extends \Twig_Extension
     }
 
     /**
-     * @return array|\Twig_Filter[]|\Twig_SimpleFilter[]
+     * @return array|\Twig\TwigFilter[]|\Twig\TwigFilter[]
      */
     public function getFilters()
     {
@@ -49,7 +49,7 @@ class RetconTwigExtension extends \Twig_Extension
         }, []);
         return \array_map(function ($method) {
             $filterName = 'retcon' . ($method != 'retcon' ? \ucfirst($method) : '');
-            return new \Twig_SimpleFilter($filterName, [Retcon::$plugin->retcon, $method]);
+            return new \Twig\TwigFilter($filterName, [Retcon::$plugin->retcon, $method], ['is_safe' => ['html']]);
         }, $methods);
     }
 }

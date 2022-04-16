@@ -9,6 +9,7 @@
 namespace mmikkel\retcon\library;
 
 use aelvan\imager\Imager;
+use craft\helpers\ImageTransforms;
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
@@ -71,7 +72,9 @@ class RetconHelper
 
         /** @var Imager|ImagerX|PluginInterface $imagerPlugin */
         $imagerPlugin = RetconHelper::getImagerPlugin();
-        $useImager = !!$imagerPlugin;
+        $useImager = (bool) $imagerPlugin;
+
+        $isCraft4 = \version_compare(Craft::$app->getVersion(), '4.0', '>=');
 
         if (\is_string($transform)) {
 
@@ -82,19 +85,18 @@ class RetconHelper
                 return self::$transforms[$transformName];
             }
 
-            $transform = Craft::$app->getAssetTransforms()->getTransformByHandle($transform);
+            if ($isCraft4) {
+                $transform = Craft::$app->getImageTransforms()->getTransformByHandle($transform);
+            } else {
+                $transform = Craft::$app->getAssetTransforms()->getTransformByHandle($transform);
+            }
 
-            if ($useImager && $transform) {
-                $transform = $transform->getAttributes();
-                $transform = [
-                    'width' => $transform['width'] ?? null,
-                    'height' => $transform['height'] ?? null,
-                    'format' => $transform['format'] ?? null,
-                    'mode' => $transform['mode'] ?? null,
-                    'position' => $transform['position'] ?? null,
-                    'interlace' => $transform['interlace'] ?? null,
-                    'quality' => $transform['quality'] ?? null,
-                ];
+            if ($useImager) {
+                if ($transform) {
+                    $transform = $transform->getAttributes(['width', 'height', 'format', 'mode', 'position', 'interlace', 'quality']);
+                } else {
+                    $transform = $transformName;
+                }
             }
 
             self::$transforms[$transformName] = $transform;
@@ -107,13 +109,17 @@ class RetconHelper
             return $transform;
         }
 
+        if ($isCraft4) {
+            return ImageTransforms::normalizeTransform($transform);
+        }
+
         return Craft::$app->getAssetTransforms()->normalizeTransform($transform);
     }
 
 
     /**
      * @param string $src
-     * @param $transform
+     * @param string|array $transform
      * @param array $imagerTransformDefaults
      * @param array $imagerConfigOverrides
      * @return object|bool
@@ -123,6 +129,15 @@ class RetconHelper
      */
     public static function getTransformedImage(string $src, $transform, array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
     {
+
+        $imageUrl = Craft::$app->getElements()->parseRefs($src);
+
+        // If we can use Imager, we need to do minimal work
+        /** @var Imager $imagerPlugin */
+        $imagerPlugin = self::getImagerPlugin();
+        if ($imagerPlugin) {
+            return $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults, $imagerConfigOverrides);
+        }
 
         /** @var RetconSettings $settings */
         $settings = Retcon::$plugin->getSettings();
@@ -135,15 +150,7 @@ class RetconHelper
             throw new Exception('No base transform URL found in settings. Please add a valid URL to the `baseTransformUrl` setting in /config/retcon.php');
         }
 
-        $imageUrl = Craft::$app->getElements()->parseRefs($src);
         $imageUrlInfo = \parse_url($imageUrl);
-
-        // If we can use Imager, we need to do minimal work
-        /** @var Imager $imagerPlugin */
-        $imagerPlugin = self::getImagerPlugin();
-        if ($imagerPlugin) {
-            return $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults, $imagerConfigOverrides);
-        }
 
         $transform = (object)$transform;
 
@@ -161,7 +168,7 @@ class RetconHelper
         }
 
         // Create transform handle if missing
-        $transformHandle = isset($transform->handle) && $transform->handle ? $transform->handle : null;
+        $transformHandle = property_exists($transform, 'handle') && $transform->handle !== null && $transform->handle ? $transform->handle : null;
         if (!$transformHandle) {
             $transformFilenameAttributes = [
                 $transformWidth . 'x' . $transformHeight,
@@ -234,13 +241,11 @@ class RetconHelper
 
             $success = $image->saveAs($imageTransformedPath);
 
-            if (!$success) {
-                if ($isDevMode) {
-                    throw new Exception(Craft::t('retcon', 'Unable to save image {path} to {savePath}', [
-                        'path' => $imagePath,
-                        'savePath' => $imageTransformedPath,
-                    ]));
-                }
+            if (!$success && $isDevMode) {
+                throw new Exception(Craft::t('retcon', 'Unable to save image {path} to {savePath}', [
+                    'path' => $imagePath,
+                    'savePath' => $imageTransformedPath,
+                ]));
             }
 
         }
@@ -288,7 +293,7 @@ class RetconHelper
         }
 
         $imageUrl = (string)RetconHelper::parseRef($img->getAttribute('src'));
-        if (!$imageUrl) {
+        if ($imageUrl === '' || $imageUrl === '0') {
             return null;
         }
 
@@ -314,7 +319,7 @@ class RetconHelper
             return null;
         }
 
-        list($width, $height) = \getimagesize($imageAbsolutePath);
+        [$width, $height] = \getimagesize($imageAbsolutePath);
 
         return [
             'width' => $width,
@@ -375,7 +380,7 @@ class RetconHelper
 
     /**
      * @param string $value
-     * @return \Twig\Markup|\Twig_Markup
+     * @return \Twig\Markup|\Twig\Markup
      * @throws \craft\errors\SiteNotFoundException
      */
     public static function parseRef(string $value)

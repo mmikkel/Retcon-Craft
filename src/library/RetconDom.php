@@ -107,7 +107,7 @@ class RetconDom
     }
 
     /**
-     * @return \Twig\Markup|\Twig_Markup
+     * @return \Twig\Markup|\Twig\Markup
      * @throws \craft\errors\SiteNotFoundException
      */
     public function getHtml()

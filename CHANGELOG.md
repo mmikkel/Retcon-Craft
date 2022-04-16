@@ -3,9 +3,13 @@
 ## Unreleased
 ### Added
 - Added support for Craft 4.0
+- Added support for Imager X named transforms
+
+### Fixed
+- Fixed a couple of instances where Retcon could return unescaped HTML  
 
 ### Changed
-- Retcon now requires Craft 3.7.x
+- Retcon now requires Craft 3.7+
 
 ## 2.3.0 - 2021-10-22  
 ### Changed  

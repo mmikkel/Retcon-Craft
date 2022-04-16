@@ -10,18 +10,20 @@
 
 namespace mmikkel\retcon\services;
 
+use Craft;
+use craft\base\Component;
 use craft\base\Element;
+use craft\elements\Asset;
+use craft\helpers\Template as TemplateHelper;
+
 use mmikkel\retcon\Retcon;
 use mmikkel\retcon\library\RetconDom;
 use mmikkel\retcon\library\RetconHelper;
 
-use Craft;
-use craft\base\Component;
-use craft\elements\Asset;
-use craft\helpers\Template as TemplateHelper;
-
 use Symfony\Component\DomCrawler\Crawler;
+
 use Twig\Template;
+
 use yii\base\Exception;
 
 /**
@@ -84,7 +86,7 @@ class RetconService extends Component
      * @param string $selector
      * @param array $imagerTransformDefaults
      * @param array $imagerConfigOverrides
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws Exception
      * @throws \aelvan\imager\exceptions\ImagerException
      * @throws \craft\errors\AssetTransformException
@@ -108,13 +110,13 @@ class RetconService extends Component
         $transform = RetconHelper::getImageTransform($transform);
 
         if (!$transform) {
-            return $html;
+            return TemplateHelper::raw($html);
         }
 
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
 
-            if (!$src = $node->getAttribute('src')) {
+            if (($src = $node->getAttribute('src')) === '' || ($src = $node->getAttribute('src')) === '0') {
                 continue;
             }
 
@@ -124,11 +126,11 @@ class RetconService extends Component
 
             $node->setAttribute('src', $transformedImage->url);
 
-            if ($node->getAttribute('width')) {
+            if ($node->getAttribute('width') !== '' && $node->getAttribute('width') !== '0') {
                 $node->setAttribute('width', $transformedImage->width);
             }
 
-            if ($node->getAttribute('height')) {
+            if ($node->getAttribute('height') !== '' && $node->getAttribute('height') !== '0') {
                 $node->setAttribute('height', $transformedImage->height);
             }
 
@@ -148,7 +150,7 @@ class RetconService extends Component
      * @param bool $base64src
      * @param array $transformDefaults
      * @param array $configOverrides
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws Exception
      * @throws \craft\errors\SiteNotFoundException
      */
@@ -191,7 +193,7 @@ class RetconService extends Component
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
 
-            if (!$src = $node->getAttribute('src')) {
+            if (($src = $node->getAttribute('src')) === '' || ($src = $node->getAttribute('src')) === '0') {
                 continue;
             }
 
@@ -239,7 +241,7 @@ class RetconService extends Component
      * @param string $selector
      * @param string $className
      * @param string $attributeName
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws Exception
      * @throws \craft\errors\SiteNotFoundException
      */
@@ -294,7 +296,7 @@ class RetconService extends Component
      * @param string $selector
      * @param string $field
      * @param bool $overwrite
-     * @return \Twig\Markup|\Twig_Markup
+     * @return \Twig\Markup|\Twig\Markup
      * @throws \craft\errors\SiteNotFoundException
      */
     public function autoAlt($html, $selector = 'img', $field = 'title', $overwrite = false)
@@ -313,7 +315,7 @@ class RetconService extends Component
 
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
-            if (!$src = $node->getAttribute('src')) {
+            if (($src = $node->getAttribute('src')) === '' || ($src = $node->getAttribute('src')) === '0') {
                 continue;
             }
             if ($overwrite || !$node->getAttribute('alt')) {
@@ -343,7 +345,7 @@ class RetconService extends Component
      * @param $selector
      * @param array $attributes
      * @param bool $overwrite
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
     public function attr($html, $selector, array $attributes, $overwrite = true)
@@ -366,12 +368,12 @@ class RetconService extends Component
                 if (!$value) {
                     // Falsey value, remove attribute
                     $node->removeAttribute($key);
-                } else if ($value === true) {
+                } elseif ($value === true) {
                     // For true, just add an empty attribute
                     $node->setAttribute($key, '');
                 } else {
                     // Add attribute, either overwriting/replacing the old attribute values or just appending to it
-                    if ($overwrite !== true && $key !== 'id') {
+                    if (!$overwrite && $key !== 'id') {
                         $attributeValues = \explode(' ', $node->getAttribute($key));
                         if ($overwrite === 'prepend') {
                             $attributeValues = \array_merge([$value], $attributeValues);
@@ -396,7 +398,7 @@ class RetconService extends Component
      * @param $html
      * @param $selector
      * @param array $attributes
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
     public function renameAttr($html, $selector, array $attributes)
@@ -434,7 +436,7 @@ class RetconService extends Component
      *
      * @param $html
      * @param $selector
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
     public function remove($html, $selector)
@@ -465,7 +467,7 @@ class RetconService extends Component
      *
      * @param $html
      * @param $selector
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
     public function only($html, $selector)
@@ -502,7 +504,7 @@ class RetconService extends Component
      * @param $html
      * @param $selector
      * @param $toTag
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
     public function change($html, $selector, $toTag)
@@ -554,7 +556,7 @@ class RetconService extends Component
      * @param $html
      * @param $selector
      * @param $container
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
     public function wrap($html, $selector, $container)
@@ -598,7 +600,7 @@ class RetconService extends Component
      *
      * @param $html
      * @param $selector
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
     public function unwrap($html, $selector)
@@ -640,7 +642,7 @@ class RetconService extends Component
      * @param $selector
      * @param $toInject
      * @param bool $overwrite
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
     public function inject($html, $selector, $toInject, $overwrite = false)
@@ -673,22 +675,16 @@ class RetconService extends Component
         foreach ($nodes as $node) {
 
             if (!$overwrite) {
-
                 if (isset($injectNode)) {
                     $node->appendChild($doc->importNode($injectNode->cloneNode(true), true));
-                } else if (isset($textNode)) {
+                } elseif (isset($textNode)) {
                     $node->appendChild($textNode->cloneNode());
                 }
-
-            } else {
-
-                if (isset($injectNode)) {
-                    $node->nodeValue = "";
-                    $node->appendChild($doc->importNode($injectNode->cloneNode(true), true));
-                } else if ($toInject) {
-                    $node->nodeValue = $toInject;
-                }
-
+            } elseif (isset($injectNode)) {
+                $node->nodeValue = "";
+                $node->appendChild($doc->importNode($injectNode->cloneNode(true), true));
+            } elseif ($toInject) {
+                $node->nodeValue = $toInject;
             }
 
         }
@@ -703,7 +699,7 @@ class RetconService extends Component
      * @param $html
      * @param $selector
      * @param bool $removeBr
-     * @return string|\Twig\Markup|\Twig_Markup|null
+     * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
     public function removeEmpty($html, $selector = null, $removeBr = false)
@@ -726,14 +722,10 @@ class RetconService extends Component
         /** @var Crawler $crawler */
         $crawler = $nodes ?? $dom->getCrawler();
 
-        if ($removeBr) {
-            $xpathQuery = '//*[not(normalize-space())]';
-        } else {
-            $xpathQuery = '//*[not(self::br)][not(normalize-space())]';
-        }
+        $xpathQuery = $removeBr ? '//*[not(normalize-space())]' : '//*[not(self::br)][not(normalize-space())]';
 
         $crawler->filterXPath($xpathQuery)->each(function (Crawler $crawler) {
-            if (!$node = $crawler->getNode(0)) {
+            if (($node = $crawler->getNode(0)) === null) {
                 return;
             }
             $node->parentNode->removeChild($node);

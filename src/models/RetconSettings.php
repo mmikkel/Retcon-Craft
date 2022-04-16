@@ -42,7 +42,7 @@ class RetconSettings extends Model
     /**
      *
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         $baseTransformPath = Craft::parseEnv($this->baseTransformPath);
