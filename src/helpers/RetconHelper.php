@@ -133,9 +133,9 @@ class RetconHelper
         $imageUrl = Craft::$app->getElements()->parseRefs($src);
 
         // If we can use Imager, we need to do minimal work
-        /** @var Imager $imagerPlugin */
         $imagerPlugin = self::getImagerPlugin();
         if ($imagerPlugin) {
+            /** @var Imager $imagerPlugin */
             return $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults, $imagerConfigOverrides);
         }
 
