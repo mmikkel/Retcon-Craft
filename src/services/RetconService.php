@@ -388,13 +388,13 @@ class RetconService extends Component
                     }
                 }
                 $normalizedAttributes = RetconHelper::getNormalizedDomNodeAttributeValues($key, $value);
-                foreach ($normalizedAttributes as $attribute => $attributeValue) {
+                foreach ($normalizedAttributes as $attributeName => $attributeValue) {
                     if ($attributeValue === false || $attributeValue === null) {
-                        $node->removeAttribute($attribute);
+                        $node->removeAttribute($attributeName);
                     } else if ($attributeValue === true) {
-                        $node->setAttribute($attribute, '');
+                        $node->setAttribute($attributeName, '');
                     } else {
-                        $node->setAttribute($attribute, $attributeValue ?? '');
+                        $node->setAttribute($attributeName, $attributeValue ?? '');
                     }
                 }
             }
