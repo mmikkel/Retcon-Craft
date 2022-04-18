@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve"><polygon points="20.7,22.2 20,21.4 19.3,20.7 15.9,24.1 15,25 19.3,29.2 20,28.5 20.7,27.8 18.9,26 17.9,25 18.9,24 "></polygon><polygon points="30,21.4 29.3,22.2 31.1,24 32.1,25 31.1,26 29.3,27.8 30,28.5 30.7,29.2 34.1,25.8 35,25 30.7,20.7 "></polygon><rect x="24" y="17.7" transform="matrix(-0.9616 -0.2743 0.2743 -0.9616 42.1828 55.8991)" width="2" height="14.6"></rect></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Artboard</title>
+    <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" fill="#1B2127" x="0" y="0" width="120" height="120" rx="40"></rect>
+        <g id="icon" transform="translate(28.000000, 37.293980)" fill="#FFFFFF" fill-rule="nonzero">
+            <path d="M18,14.4707259 L15.7894737,11.9295494 L13.5789474,9.70602 L2.84210526,20.50602 L0,23.3648435 L13.5789474,36.70602 L15.7894737,34.4824906 L18,32.2589612 L12.3157895,26.5413141 L9.15789474,23.3648435 L12.3157895,20.1883729 L18,14.4707259 Z M48.2105263,11.9295494 L46,14.4707259 L51.6842105,20.1883729 L54.8421053,23.3648435 L51.6842105,26.5413141 L46,32.2589612 L48.2105263,34.4824906 L50.4210526,36.70602 L61.1578947,25.90602 L64,23.3648435 L50.4210526,9.70602 L48.2105263,11.9295494 Z M28.7190382,46 L22.6546399,44.2701077 L35.2828538,0 L41.3472521,1.72989232 L28.7190382,46 Z" id="Combined-Shape"></path>
+        </g>
+    </g>
+</svg>
