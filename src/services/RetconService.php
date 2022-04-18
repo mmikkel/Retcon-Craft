@@ -14,11 +14,13 @@ use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use craft\elements\Asset;
+use craft\helpers\ArrayHelper;
+use craft\helpers\Html;
 use craft\helpers\Template as TemplateHelper;
 
 use mmikkel\retcon\Retcon;
+use mmikkel\retcon\helpers\RetconHelper;
 use mmikkel\retcon\library\RetconDom;
-use mmikkel\retcon\library\RetconHelper;
 
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -344,7 +346,7 @@ class RetconService extends Component
      * @param $html
      * @param $selector
      * @param array $attributes
-     * @param bool $overwrite
+     * @param string|bool $overwrite (true, false, "prepend" or "append")
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
@@ -355,6 +357,10 @@ class RetconService extends Component
             return $html;
         }
 
+        if (empty($attributes)) {
+            return TemplateHelper::raw($html);
+        }
+
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
@@ -362,28 +368,32 @@ class RetconService extends Component
             return TemplateHelper::raw($html);
         }
 
+        if ($overwrite === false) {
+            $overwrite = 'append';
+        } else if ($overwrite !== true && !\in_array($overwrite, ['append', 'prepend'])) {
+            $overwrite = true;
+        }
+
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
             foreach ($attributes as $key => $value) {
-                if (!$value) {
-                    // Falsey value, remove attribute
-                    $node->removeAttribute($key);
-                } elseif ($value === true) {
-                    // For true, just add an empty attribute
-                    $node->setAttribute($key, '');
-                } else {
-                    // Add attribute, either overwriting/replacing the old attribute values or just appending to it
-                    if (!$overwrite && $key !== 'id') {
-                        $attributeValues = \explode(' ', $node->getAttribute($key));
-                        if ($overwrite === 'prepend') {
-                            $attributeValues = \array_merge([$value], $attributeValues);
-                        } else {
-                            $attributeValues[] = $value;
-                        }
-                    } else {
-                        $attributeValues = [$value];
+                $values = \is_array($value) ? $value : [$value];
+                if ($overwrite !== true && $key !== 'id' && !\is_bool($value) && (!\is_array($value) || !ArrayHelper::isAssociative($value)) && $currentValue = $node->getAttribute($key)) {
+                    if ($overwrite === 'append') {
+                        $values = \array_merge([$currentValue], $values);
+                    } else if ($overwrite === 'prepend') {
+                        $values[] = $currentValue;
                     }
-                    $node->setAttribute($key, \trim(\implode(' ', \array_unique(\array_filter($attributeValues)))));
+                }
+                $normalizedAttributes = RetconHelper::getNormalizedDomNodeAttributeValues($key, $values);
+                foreach ($normalizedAttributes as $attribute => $value) {
+                    if ($value === false) {
+                        $node->removeAttribute($attribute);
+                    } else if ($value === true) {
+                        $node->setAttribute($attribute, '');
+                    } else {
+                        $node->setAttribute($attribute, $value ?? '');
+                    }
                 }
             }
         }

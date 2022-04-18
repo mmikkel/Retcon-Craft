@@ -6,10 +6,9 @@
  * Time: 18:24
  */
 
-namespace mmikkel\retcon\library;
+namespace mmikkel\retcon\helpers;
 
 use aelvan\imager\Imager;
-use craft\helpers\ImageTransforms;
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
@@ -19,13 +18,16 @@ use Craft;
 use craft\base\Image;
 use craft\base\PluginInterface;
 use craft\helpers\FileHelper;
+use craft\helpers\Html;
 use craft\helpers\Image as ImageHelper;
+use craft\helpers\ImageTransforms;
 use craft\helpers\StringHelper;
 use craft\helpers\Template as TemplateHelper;
 use craft\helpers\UrlHelper;
 use craft\models\AssetTransform;
 
 use yii\base\Exception;
+use yii\helpers\Json;
 
 class RetconHelper
 {
@@ -413,6 +415,68 @@ class RetconHelper
         }
         $pluginsService = Craft::$app->getPlugins();
         return $pluginsService->getPlugin('imager') ?? $pluginsService->getPlugin('imager-x');
+    }
+
+    /**
+     * @param string $key
+     * @param array $attributes
+     * @return array
+     */
+    public static function getNormalizedDomNodeAttributeValues(string $key, array $attributes): array
+    {
+
+        $attributes = Html::normalizeTagAttributes([$key => $attributes]);
+
+        if (count($attributes) > 1) {
+            $sorted = [];
+            foreach (Html::$attributeOrder as $name) {
+                if (isset($attributes[$name])) {
+                    $sorted[$name] = $attributes[$name];
+                }
+            }
+            $attributes = array_merge($sorted, $attributes);
+        }
+
+        $return = [];
+        foreach ($attributes as $name => $value) {
+            if (is_bool($value)) {
+                $return[$name] = $value;
+            } elseif (\is_array($value)) {
+                if (\in_array($name, Html::$dataAttributes)) {
+                    foreach ($value as $n => $v) {
+                        $attribute = "$name-$n";
+                        if (is_bool($v)) {
+                            $return[$attribute] = $v;
+                        } elseif (is_array($v)) {
+                            $return[$attribute] = Json::htmlEncode($v);
+                        } else {
+                            $return[$attribute] = Html::encode($v);
+                        }
+                    }
+                } elseif ($name === 'class') {
+                    if (empty($value)) {
+                        continue;
+                    }
+                    if (Html::$normalizeClassAttribute === true && count($value) > 1) {
+                        // removes duplicate classes
+                        $value = explode(' ', implode(' ', $value));
+                        $value = array_unique($value);
+                    }
+                    $return[$name] = Html::encode(implode(' ', $value));
+                } elseif ($name === 'style') {
+                    if (empty($value)) {
+                        continue;
+                    }
+                    $return[$name] = Html::encode(Html::cssStyleFromArray($value));
+                } else {
+                    $return[$name] = Json::htmlEncode($value);
+                }
+            } elseif ($value !== null) {
+                $return[$name] = Html::encode($value);
+            }
+        }
+
+        return $return;
     }
 
 }

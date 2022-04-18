@@ -4,6 +4,7 @@
 ### Added
 - Added support for Craft 4.0
 - Added support for Imager X named transforms  
+- Added support for passing objects and arrays to the `|retconAttr` filter, similarly to the native `|attr` filter
 
 ### Fixed
 - Fixed a couple of instances where Retcon could return unescaped HTML  
