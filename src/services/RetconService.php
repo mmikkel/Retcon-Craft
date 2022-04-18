@@ -118,7 +118,8 @@ class RetconService extends Component
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
 
-            if (($src = $node->getAttribute('src')) === '' || ($src = $node->getAttribute('src')) === '0') {
+            $src = $node->getAttribute('src');
+            if (!$src || $src === '0') {
                 continue;
             }
 
@@ -195,7 +196,8 @@ class RetconService extends Component
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
 
-            if (($src = $node->getAttribute('src')) === '' || ($src = $node->getAttribute('src')) === '0') {
+            $src = $node->getAttribute('src');
+            if (!$src || $src === '0') {
                 continue;
             }
 
@@ -386,13 +388,13 @@ class RetconService extends Component
                     }
                 }
                 $normalizedAttributes = RetconHelper::getNormalizedDomNodeAttributeValues($key, $value);
-                foreach ($normalizedAttributes as $attribute => $value) {
-                    if ($value === false || $value === null) {
+                foreach ($normalizedAttributes as $attribute => $attributeValue) {
+                    if ($attributeValue === false || $attributeValue === null) {
                         $node->removeAttribute($attribute);
-                    } else if ($value === true) {
+                    } else if ($attributeValue === true) {
                         $node->setAttribute($attribute, '');
                     } else {
-                        $node->setAttribute($attribute, $value ?? '');
+                        $node->setAttribute($attribute, $attributeValue ?? '');
                     }
                 }
             }
