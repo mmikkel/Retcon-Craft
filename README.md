@@ -1,4 +1,4 @@
-# Retcon 2 plugin for Craft CMS 3.x
+# Retcon plugin for Craft CMS
 
 Retcon is a tiny Craft CMS plugin adding a series of powerful Twig filters for modifying HTML content. **Here are some of the things Retcon can do:**
 
@@ -17,7 +17,7 @@ Retcon is a tiny Craft CMS plugin adding a series of powerful Twig filters for m
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0-RC1 or later.
+This plugin requires Craft CMS 3.7.0 or 4.0.0-beta.4.  
 
 ## Installation
 
@@ -37,15 +37,13 @@ To install the plugin, follow these instructions.
 
 Alternatively, Retcon can be installed from the Craft CMS Plugin Store inside the Craft Control Panel.
 
-**This plugin will be free forever.**
-
 ## How does it work?
 
 Retcon uses PHP's native [DOMDocument](http://php.net/manual/en/class.domdocument.php) class to parse and modify HTML. Additionally, [Masterminds' HTML5 library](https://github.com/Masterminds/html5-php) is used for HTML5 support, and Symfony's [DomCrawler](https://symfony.com/doc/3.3/components/dom_crawler.html) and [CssSelector](https://symfony.com/doc/3.3/components/css_selector.html) components are used to enable the powerful jQuery-like selector syntax.
 
 ## Changes in Retcon 2.x
 
-Except for the `replace` method being removed, Retcon 2.x should be completely backwards compatible with Retcon 1. These are the big changes:
+Retcon 2.x is almost completely backwards compatible with Retcon 1.x. These are the big changes:
 
 * Symfony's [DomCrawler](https://symfony.com/doc/3.3/components/dom_crawler.html) and [CssSelector](https://symfony.com/doc/3.3/components/css_selector.html) components have been added for _much_ more powerful selector capabilities (almost all CSS selectors work). Retcon is basically jQuery now! **Note: all existing selectors in your code will still work, if you're upgrading from Retcon 1.x.**
 
@@ -79,13 +77,13 @@ Note that for the Twig filters, the prefix `retcon` is added to the method name 
 
 #### Filter tag pair
 
-For use cases where your HTML is not in a field or variable, the _filter tag pair_ syntax works nicely – the following example adds `rel="noopener noreferrer"` to all `<a>` tags with `target="_blank"`:
+For use cases where your HTML is not in a field or variable, the _apply tag pair_ syntax works nicely – the following example adds `rel="noopener noreferrer"` to all `<a>` tags with `target="_blank"`:
 
 ```twig
-{% filter retconAttr('a[target="_blank"]:not([rel])', { rel: 'noopener noreferrer' }) %}
+{% apply retconAttr('a[target="_blank"]:not([rel])', { rel: 'noopener noreferrer' }) %}
     {# A whole bunch of HTML in here #}
     ....
-{% endfilter %}
+{% endapply %}
 ```
 
 #### Catch-all filter
@@ -111,7 +109,7 @@ If you want to use Retcon in a Craft plugin or module, all methods are also avai
 
 ```php
 use mmikkel\retcon\Retcon;
-echo Retcon::$plugin->retcon->attr($entry->body, [ 'class' => 'image' ]);
+echo Retcon::getInstance()->retcon->attr($entry->body, [ 'class' => 'image' ]);
 ```
 
 For an actual use case example; here's how the `rel="noopener noreferrer"` example could look in a module (basically, the below code would add `rel="noopener noreferrer"` automatically to _all_ `<a target="_blank">` tags in your templates (unless they've already got a `rel` attribute set, of course):
@@ -131,7 +129,7 @@ public function init() {
 
             if ($event->output && Craft::$app->getPlugins()->getPlugin('retcon')) {
                 $event->output =
-                    Retcon::$plugin->retcon->attr(
+                    Retcon::getInstance()->retcon->attr(
                         $event->output,
                         'a[target="_blank"]:not([rel])', [
                             'rel' => 'noopener noreferrer',
