@@ -9,6 +9,7 @@
 namespace mmikkel\retcon\helpers;
 
 use aelvan\imager\Imager;
+use craft\helpers\App;
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
@@ -70,7 +71,7 @@ class RetconHelper
 
         /** @var Imager|ImagerX|PluginInterface $imagerPlugin */
         $imagerPlugin = RetconHelper::getImagerPlugin();
-        $useImager = (bool) $imagerPlugin;
+        $useImager = (bool)$imagerPlugin;
 
         $isCraft4 = \version_compare(Craft::$app->getVersion(), '4.0', '>=');
 
@@ -477,6 +478,18 @@ class RetconHelper
         }
 
         return $return;
+    }
+
+    /**
+     * @param string|null $value
+     * @return bool|string|null
+     */
+    public static function parseEnv(?string $value)
+    {
+        if (\version_compare(Craft::$app->getVersion(), '3.7.29', '<')) {
+            return Craft::parseEnv($value);
+        }
+        return App::parseEnv($value);
     }
 
 }
