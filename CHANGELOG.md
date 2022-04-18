@@ -1,6 +1,6 @@
 # Retcon Changelog
 
-## Unreleased
+## 2.4.0 - 2022-04-18  
 ### Added
 - Added support for Craft 4.0
 - Added support for Imager X named transforms  
