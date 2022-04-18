@@ -319,23 +319,25 @@ class RetconService extends Component
 
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
-            if (($src = $node->getAttribute('src')) === '' || ($src = $node->getAttribute('src')) === '0') {
+            if ($node->getAttribute('alt') && !$overwrite) {
                 continue;
             }
-            if ($overwrite || !$node->getAttribute('alt')) {
-                $elementId = RetconHelper::getElementIdFromRef($src);
-                /** @var Element $element */
-                $element = $elementId ? Craft::$app->getElements()->getElementById($elementId) : null;
-                $alt = null;
-                if ($element) {
-                    $alt = $element->$field ?: $element->title ?: null;
-                }
-                if (!$alt) {
-                    $imageSourcePathinfo = \pathinfo($src);
-                    $alt = $imageSourcePathinfo['filename'] ?? '';
-                }
-                $node->setAttribute('alt', $alt);
+            $src = $node->getAttribute('src');
+            if (!$src || $src === '0') {
+                continue;
             }
+            $elementId = RetconHelper::getElementIdFromRef($src);
+            /** @var Element $element */
+            $element = $elementId ? Craft::$app->getElements()->getElementById($elementId) : null;
+            $alt = null;
+            if ($element) {
+                $alt = $element->$field ?: $element->title ?: null;
+            }
+            if (!$alt) {
+                $imageSourcePathinfo = \pathinfo($src);
+                $alt = $imageSourcePathinfo['filename'] ?? '';
+            }
+            $node->setAttribute('alt', $alt);
         }
 
         return $dom->getHtml();
