@@ -10,6 +10,7 @@ namespace mmikkel\retcon\helpers;
 
 use aelvan\imager\Imager;
 use craft\helpers\App;
+use craft\helpers\ArrayHelper;
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
@@ -420,10 +421,10 @@ class RetconHelper
 
     /**
      * @param string $key
-     * @param array $attributes
+     * @param string|bool|array|null $attributes
      * @return array
      */
-    public static function getNormalizedDomNodeAttributeValues(string $key, array $attributes): array
+    public static function getNormalizedDomNodeAttributeValues(string $key, $attributes = null): array
     {
 
         $attributes = Html::normalizeTagAttributes([$key => $attributes]);
@@ -440,16 +441,20 @@ class RetconHelper
 
         $return = [];
         foreach ($attributes as $name => $value) {
-            if (is_bool($value)) {
+            if (is_bool($value) || $value === null) {
                 $return[$name] = $value;
             } elseif (\is_array($value)) {
                 if (\in_array($name, Html::$dataAttributes)) {
                     foreach ($value as $n => $v) {
                         $attribute = "$name-$n";
-                        if (is_bool($v)) {
+                        if (is_bool($v) || $value === null) {
                             $return[$attribute] = $v;
                         } elseif (is_array($v)) {
-                            $return[$attribute] = Json::htmlEncode($v);
+                            if (!ArrayHelper::isAssociative($v) && count($v) == count($v, COUNT_RECURSIVE)) {
+                                $return[$attribute] = Html::encode(\trim(\implode(' ', \array_unique($v)) ?: ''));
+                            } else {
+                                $return[$attribute] = Json::htmlEncode($v);
+                            }
                         } else {
                             $return[$attribute] = Html::encode($v);
                         }
@@ -458,7 +463,7 @@ class RetconHelper
                     if (empty($value)) {
                         continue;
                     }
-                    if (Html::$normalizeClassAttribute === true && count($value) > 1) {
+                    if (count($value) > 1) {
                         // removes duplicate classes
                         $value = explode(' ', implode(' ', $value));
                         $value = array_unique($value);
@@ -469,6 +474,8 @@ class RetconHelper
                         continue;
                     }
                     $return[$name] = Html::encode(Html::cssStyleFromArray($value));
+                } elseif (!ArrayHelper::isAssociative($value) && count($value) == count($value, COUNT_RECURSIVE)) {
+                    $return[$name] = Html::encode(\trim(\implode(' ', \array_unique($value)) ?: ''));
                 } else {
                     $return[$name] = Json::htmlEncode($value);
                 }

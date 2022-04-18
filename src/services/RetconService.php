@@ -377,17 +377,17 @@ class RetconService extends Component
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
             foreach ($attributes as $key => $value) {
-                $values = \is_array($value) ? $value : [$value];
                 if ($overwrite !== true && $key !== 'id' && !\is_bool($value) && (!\is_array($value) || !ArrayHelper::isAssociative($value)) && $currentValue = $node->getAttribute($key)) {
+                    $value = \is_array($value) ? $value : [$value];
                     if ($overwrite === 'append') {
-                        $values = \array_merge([$currentValue], $values);
+                        $value = \array_merge([$currentValue], $value);
                     } else if ($overwrite === 'prepend') {
-                        $values[] = $currentValue;
+                        $value[] = $currentValue;
                     }
                 }
-                $normalizedAttributes = RetconHelper::getNormalizedDomNodeAttributeValues($key, $values);
+                $normalizedAttributes = RetconHelper::getNormalizedDomNodeAttributeValues($key, $value);
                 foreach ($normalizedAttributes as $attribute => $value) {
-                    if ($value === false) {
+                    if ($value === false || $value === null) {
                         $node->removeAttribute($attribute);
                     } else if ($value === true) {
                         $node->setAttribute($attribute, '');
