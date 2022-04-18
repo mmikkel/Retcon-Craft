@@ -504,7 +504,9 @@ class RetconService extends Component
             $fragment->appendChild($node);
         }
 
-        $doc->firstChild->parentNode->replaceChild($fragment, $doc->firstChild);
+        if ($doc->firstChild instanceof \DOMNode && $doc->firstChild->parentNode instanceof \DOMNode) {
+            $doc->firstChild->parentNode->replaceChild($fragment, $doc->firstChild);
+        }
 
         return $dom->getHtml();
 
@@ -737,7 +739,7 @@ class RetconService extends Component
         $xpathQuery = $removeBr ? '//*[not(normalize-space())]' : '//*[not(self::br)][not(normalize-space())]';
 
         $crawler->filterXPath($xpathQuery)->each(function (Crawler $crawler) {
-            if (($node = $crawler->getNode(0)) === null) {
+            if (($node = $crawler->getNode(0)) === null || !$node->parentNode instanceof \DOMNode) {
                 return;
             }
             $node->parentNode->removeChild($node);
