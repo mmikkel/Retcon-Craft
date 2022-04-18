@@ -450,7 +450,7 @@ class RetconHelper
                         if (is_bool($v) || $value === null) {
                             $return[$attribute] = $v;
                         } elseif (is_array($v)) {
-                            if (!ArrayHelper::isAssociative($v) && count($v) == count($v, COUNT_RECURSIVE)) {
+                            if (!ArrayHelper::isAssociative($v) && count($v) === count($v, COUNT_RECURSIVE)) {
                                 $return[$attribute] = Html::encode(\trim(\implode(' ', \array_unique($v)) ?: ''));
                             } else {
                                 $return[$attribute] = Json::htmlEncode($v);
@@ -474,7 +474,7 @@ class RetconHelper
                         continue;
                     }
                     $return[$name] = Html::encode(Html::cssStyleFromArray($value));
-                } elseif (!ArrayHelper::isAssociative($value) && count($value) == count($value, COUNT_RECURSIVE)) {
+                } elseif (!ArrayHelper::isAssociative($value) && count($value) === count($value, COUNT_RECURSIVE)) {
                     $return[$name] = Html::encode(\trim(\implode(' ', \array_unique($value)) ?: ''));
                 } else {
                     $return[$name] = Json::htmlEncode($value);

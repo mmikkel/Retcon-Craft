@@ -372,7 +372,7 @@ class RetconService extends Component
 
         if ($overwrite === false) {
             $overwrite = 'append';
-        } else if ($overwrite !== true && !\in_array($overwrite, ['append', 'prepend'])) {
+        } elseif ($overwrite !== true && !\in_array($overwrite, ['append', 'prepend'])) {
             $overwrite = true;
         }
 
@@ -383,7 +383,7 @@ class RetconService extends Component
                     $value = \is_array($value) ? $value : [$value];
                     if ($overwrite === 'append') {
                         $value = \array_merge([$currentValue], $value);
-                    } else if ($overwrite === 'prepend') {
+                    } elseif ($overwrite === 'prepend') {
                         $value[] = $currentValue;
                     }
                 }
@@ -391,7 +391,7 @@ class RetconService extends Component
                 foreach ($normalizedAttributes as $attributeName => $attributeValue) {
                     if ($attributeValue === false || $attributeValue === null) {
                         $node->removeAttribute($attributeName);
-                    } else if ($attributeValue === true) {
+                    } elseif ($attributeValue === true) {
                         $node->setAttribute($attributeName, '');
                     } else {
                         $node->setAttribute($attributeName, $attributeValue ?? '');
