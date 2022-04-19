@@ -447,16 +447,12 @@ class RetconHelper
                 if (\in_array($name, Html::$dataAttributes)) {
                     foreach ($value as $n => $v) {
                         $attribute = "$name-$n";
-                        if (is_bool($v) || $value === null) {
+                        if (is_bool($v) || $v === null) {
                             $return[$attribute] = $v;
                         } elseif (is_array($v)) {
-                            if (!ArrayHelper::isAssociative($v) && count($v) === count($v, COUNT_RECURSIVE)) {
-                                $return[$attribute] = Html::encode(\trim(\implode(' ', \array_unique($v)) ?: ''));
-                            } else {
-                                $return[$attribute] = Json::htmlEncode($v);
-                            }
+                            $return[$attribute] = Json::htmlEncode($v);
                         } else {
-                            $return[$attribute] = Html::encode($v);
+                            $return[$attribute] = $v;
                         }
                     }
                 } elseif ($name === 'class') {
@@ -468,19 +464,17 @@ class RetconHelper
                         $value = explode(' ', implode(' ', $value));
                         $value = array_unique($value);
                     }
-                    $return[$name] = Html::encode(implode(' ', $value));
+                    $return[$name] = \trim(implode(' ', $value));
                 } elseif ($name === 'style') {
                     if (empty($value)) {
                         continue;
                     }
-                    $return[$name] = Html::encode(Html::cssStyleFromArray($value));
-                } elseif (!ArrayHelper::isAssociative($value) && count($value) === count($value, COUNT_RECURSIVE)) {
-                    $return[$name] = Html::encode(\trim(\implode(' ', \array_unique($value)) ?: ''));
+                    $return[$name] = Html::cssStyleFromArray($value);
                 } else {
                     $return[$name] = Json::htmlEncode($value);
                 }
-            } elseif ($value !== null) {
-                $return[$name] = Html::encode($value);
+            } else {
+                $return[$name] = $value;
             }
         }
 

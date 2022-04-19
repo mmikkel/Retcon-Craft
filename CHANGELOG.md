@@ -1,5 +1,11 @@
 # Retcon Changelog
 
+## 2.4.1 - 2022-04-19
+### Fixed
+- Reverted a breaking change in 2.4.0 where HTML entities in attribute values created with the `retconAttr` would be encoded  
+### Changed
+- Array values in HTML attributes created with the `retconAttr` filter are now always JSON-encoded, excepting the `class` and `style` attributes, similarly to how the native `attr` filter works  
+
 ## 2.4.0 - 2022-04-18  
 ### Added
 - Added support for Craft 4.0
