@@ -28,6 +28,7 @@ use craft\helpers\Template as TemplateHelper;
 use craft\helpers\UrlHelper;
 use craft\models\AssetTransform;
 
+use Twig\Markup;
 use yii\base\Exception;
 use yii\helpers\Json;
 
@@ -426,6 +427,10 @@ class RetconHelper
      */
     public static function getNormalizedDomNodeAttributeValues(string $key, $attributes = null): array
     {
+
+        if ($attributes instanceof Markup) {
+            $attributes = (string)$attributes;
+        }
 
         $attributes = Html::normalizeTagAttributes([$key => $attributes]);
 

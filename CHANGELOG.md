@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.4.2 - 2022-04-27  
+### Fixed  
+- Fixes an exception that would be thrown when setting `style` and `class` attributes with the `retconAttr` filter, using values returned by Twig macros   
+
 ## 2.4.1 - 2022-04-19
 ### Fixed
 - Reverted a breaking change in 2.4.0 where HTML entities in attribute values created with the `retconAttr` would be encoded  
