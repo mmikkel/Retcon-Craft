@@ -85,7 +85,7 @@ class RetconService extends Component
      *
      * @param $html
      * @param $transform
-     * @param string $selector
+     * @param string|string[] $selector
      * @param array $imagerTransformDefaults
      * @param array $imagerConfigOverrides
      * @return string|\Twig\Markup|\Twig\Markup|null
@@ -119,7 +119,7 @@ class RetconService extends Component
         foreach ($nodes as $node) {
 
             $src = $node->getAttribute('src');
-            if (!$src || $src === '0') {
+            if (!$src) {
                 continue;
             }
 
@@ -148,8 +148,8 @@ class RetconService extends Component
      *
      * @param $html
      * @param $transforms
-     * @param string $selector
-     * @param string|array $sizes
+     * @param string|string[] $selector
+     * @param string|string[] $sizes
      * @param bool $base64src
      * @param array $transformDefaults
      * @param array $configOverrides
@@ -157,7 +157,7 @@ class RetconService extends Component
      * @throws Exception
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function srcset($html, $transforms, $selector = 'img', $sizes = '100w', $base64src = false, $transformDefaults = [], $configOverrides = [])
+    public function srcset($html, $transforms, $selector = 'img', $sizes = '100w', bool $base64src = false, array $transformDefaults = [], array $configOverrides = [])
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
@@ -197,7 +197,7 @@ class RetconService extends Component
         foreach ($nodes as $node) {
 
             $src = $node->getAttribute('src');
-            if (!$src || $src === '0') {
+            if (!$src) {
                 continue;
             }
 
@@ -242,14 +242,14 @@ class RetconService extends Component
      * Prepares all images (or all nodes matching the selector(s) passed) by swapping out the `src` attribute with a base64 encoded, transparent SVG. The original source will be retained in a data attribute
      *
      * @param $html
-     * @param string $selector
+     * @param string|string[] $selector
      * @param string $className
      * @param string $attributeName
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws Exception
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function lazy($html, $selector = 'img', $className = 'lazyload', $attributeName = 'src')
+    public function lazy($html, $selector = 'img', string $className = 'lazyload', string $attributeName = 'src')
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
@@ -297,13 +297,13 @@ class RetconService extends Component
      * Attempts to auto-generate alternative text for all images (or all elements matching the $selector attribute).
      *
      * @param $html
-     * @param string $selector
+     * @param string|string[] $selector
      * @param string $field
      * @param bool $overwrite
      * @return \Twig\Markup|\Twig\Markup
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function autoAlt($html, $selector = 'img', $field = 'title', $overwrite = false)
+    public function autoAlt($html, $selector = 'img', string $field = 'title', bool $overwrite = false)
     {
 
         if (!RetconHelper::getHtmlFromParam($html)) {
@@ -323,7 +323,7 @@ class RetconService extends Component
                 continue;
             }
             $src = $node->getAttribute('src');
-            if (!$src || $src === '0') {
+            if (!$src) {
                 continue;
             }
             $elementId = RetconHelper::getElementIdFromRef($src);
@@ -348,7 +348,7 @@ class RetconService extends Component
      * Adds (to) or replaces one or many attributes for one or many selectors
      *
      * @param $html
-     * @param $selector
+     * @param string|string[] $selector
      * @param array $attributes
      * @param string|bool $overwrite (true, false, "prepend" or "append")
      * @return string|\Twig\Markup|\Twig\Markup|null
@@ -410,7 +410,7 @@ class RetconService extends Component
      * Renames attributes for matching selector(s)
      *
      * @param $html
-     * @param $selector
+     * @param string|string[] $selector
      * @param array $attributes
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
@@ -449,7 +449,7 @@ class RetconService extends Component
      * Remove all elements matching given selector(s)
      *
      * @param $html
-     * @param $selector
+     * @param string|string[] $selector
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
@@ -480,7 +480,7 @@ class RetconService extends Component
      * Remove everything except nodes matching given selector(s)
      *
      * @param $html
-     * @param $selector
+     * @param string|string[] $selector
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
@@ -518,12 +518,12 @@ class RetconService extends Component
      * Changes tag type/name for given selector(s). Can also remove tags (whilst retaining their contents) by passing `false` for the $toTag parameter
      *
      * @param $html
-     * @param $selector
-     * @param $toTag
+     * @param string|string[] $selector
+     * @param string $toTag
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function change($html, $selector, $toTag)
+    public function change($html, $selector, string $toTag)
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
@@ -570,12 +570,12 @@ class RetconService extends Component
      * Wraps all nodes matching the given selector(s) in a container
      *
      * @param $html
-     * @param $selector
-     * @param $container
+     * @param string|string[] $selector
+     * @param string $container
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function wrap($html, $selector, $container)
+    public function wrap($html, $selector, string $container)
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
@@ -615,7 +615,7 @@ class RetconService extends Component
      * Removes the parent of all nodes matching given selector(s), retaining all child nodes
      *
      * @param $html
-     * @param $selector
+     * @param string|string[] $selector
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
@@ -655,13 +655,13 @@ class RetconService extends Component
      * Injects string value (could be HTML!) into all nodes matching given selector(s)
      *
      * @param $html
-     * @param $selector
-     * @param $toInject
+     * @param string|string[] $selector
+     * @param string $toInject
      * @param bool $overwrite
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function inject($html, $selector, $toInject, $overwrite = false)
+    public function inject($html, $selector, string $toInject, bool $overwrite = false)
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
@@ -713,12 +713,12 @@ class RetconService extends Component
      * Removes empty nodes matching given selector(s), or all empty nodes if no selector
      *
      * @param $html
-     * @param $selector
+     * @param string|string[]|null $selector
      * @param bool $removeBr
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function removeEmpty($html, $selector = null, $removeBr = false)
+    public function removeEmpty($html, $selector = null, bool $removeBr = false)
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
