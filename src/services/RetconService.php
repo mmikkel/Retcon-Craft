@@ -69,7 +69,7 @@ class RetconService extends Component
             $filter = \array_shift($args);
 
             if (!\method_exists($this, $filter)) {
-                throw new Exception('Undefined filter method {$filter}');
+                throw new Exception("Retcon filter \"$filter\" does not exist");
             }
 
             $html = \call_user_func_array([$this, $filter], \array_merge([$html], $args));
