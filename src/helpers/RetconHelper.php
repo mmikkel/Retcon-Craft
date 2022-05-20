@@ -9,8 +9,7 @@
 namespace mmikkel\retcon\helpers;
 
 use aelvan\imager\Imager;
-use craft\helpers\App;
-use craft\helpers\ArrayHelper;
+
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
@@ -19,6 +18,7 @@ use mmikkel\retcon\Retcon;
 use Craft;
 use craft\base\Image;
 use craft\base\PluginInterface;
+use craft\helpers\App;
 use craft\helpers\FileHelper;
 use craft\helpers\Html;
 use craft\helpers\Image as ImageHelper;
@@ -26,9 +26,9 @@ use craft\helpers\ImageTransforms;
 use craft\helpers\StringHelper;
 use craft\helpers\Template as TemplateHelper;
 use craft\helpers\UrlHelper;
-use craft\models\AssetTransform;
 
 use Twig\Markup;
+
 use yii\base\Exception;
 use yii\helpers\Json;
 
@@ -41,10 +41,10 @@ class RetconHelper
     protected static $transforms = [];
 
     /**
-     * @param $value
+     * @param mixed $value
      * @return null|string
      */
-    public static function getHtmlFromParam($value)
+    public static function getHtmlFromParam($value): ?string
     {
         $html = (string)$value;
         if (!\preg_replace('/\s+/', '', $value)) {
@@ -58,15 +58,16 @@ class RetconHelper
      * @param int $height
      * @return string
      */
-    public static function getBase64Pixel($width = 1, $height = 1)
+    public static function getBase64Pixel(int $width = 1, int $height = 1): string
     {
         return "data:image/svg+xml;charset=utf-8," . \rawurlencode("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 $width $height'/>");
     }
 
     /**
-     * @param string|array $transform
-     * @return array|AssetTransform|mixed|null
+     * @param mixed $transform
+     * @return mixed
      * @throws \craft\errors\AssetTransformException
+     * @throws \craft\errors\ImageTransformException
      */
     public static function getImageTransform($transform)
     {
@@ -227,7 +228,6 @@ class RetconHelper
         // Transform image
         if (!\file_exists($imageTransformedPath)) {
 
-            /** @var Image $image */
             $image = Craft::$app->getImages()->loadImage($imagePath);
 
             switch ($transformMode) {
@@ -265,9 +265,9 @@ class RetconHelper
     /**
      * @param array $images
      * @param string $descriptor
-     * @return mixed
+     * @return string
      */
-    public static function getSrcsetAttribute(array $images, $descriptor = 'w')
+    public static function getSrcsetAttribute(array $images, string $descriptor = 'w'): string
     {
         $sizes = [];
         foreach ($images as $image) {
@@ -281,7 +281,7 @@ class RetconHelper
      * @return array|null
      * @throws Exception
      */
-    public static function getImageDimensions(\DOMNode $img)
+    public static function getImageDimensions(\DOMNode $img): ?array
     {
 
         $width = $img->getAttribute('width') ?: null;
@@ -334,7 +334,7 @@ class RetconHelper
      * @param $selector
      * @return object
      */
-    public static function getSelectorObject($selector)
+    public static function getSelectorObject($selector): object
     {
 
         $delimiters = array('id' => '#', 'class' => '.');
@@ -385,7 +385,7 @@ class RetconHelper
      * @return \Twig\Markup|\Twig\Markup
      * @throws \craft\errors\SiteNotFoundException
      */
-    public static function parseRef(string $value)
+    public static function parseRef(string $value): string
     {
         return TemplateHelper::raw(Craft::$app->getElements()->parseRefs($value, Craft::$app->getSites()->getCurrentSite()->id));
     }
@@ -394,7 +394,7 @@ class RetconHelper
      * @param string $ref
      * @return int|null
      */
-    public static function getElementIdFromRef(string $ref)
+    public static function getElementIdFromRef(string $ref): ?int
     {
         if ($ref[0] !== '{' || $ref[strlen($ref) - 1] !== '}') {
             return null;
