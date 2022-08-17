@@ -1,6 +1,6 @@
 # Retcon Changelog
 
-## Unreleased - 2022-08-17
+## 2.4.3 - 2022-08-17
 ### Changed
 - The `selector`, `sizes`, `base64src`, `className`, `attributeName`, `imagerTransformDefaults` and `imagerConfigOverrides` parameters are now nullable for the `retconTransform`, `retconLazy` and `retconSrcset` filters  
 
