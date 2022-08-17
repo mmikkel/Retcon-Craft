@@ -85,21 +85,24 @@ class RetconService extends Component
      *
      * @param $html
      * @param $transform
-     * @param string|string[] $selector
-     * @param array $imagerTransformDefaults
-     * @param array $imagerConfigOverrides
-     * @return string|\Twig\Markup|\Twig\Markup|null
+     * @param string|string[]|null $selector
+     * @param array|null $imagerTransformDefaults
+     * @param array|null $imagerConfigOverrides
+     * @return string|\Twig\Markup|null
      * @throws Exception
-     * @throws \aelvan\imager\exceptions\ImagerException
-     * @throws \craft\errors\AssetTransformException
      * @throws \craft\errors\ImageException
+     * @throws \craft\errors\ImageTransformException
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function transform($html, $transform, $selector = 'img', array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
+    public function transform($html, $transform, $selector = null, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
             return $html;
+        }
+
+        if (empty($selector)) {
+            $selector = 'img';
         }
 
         $dom = new RetconDom($html);
@@ -148,20 +151,32 @@ class RetconService extends Component
      *
      * @param $html
      * @param $transforms
-     * @param string|string[] $selector
-     * @param string|string[] $sizes
-     * @param bool $base64src
-     * @param array $transformDefaults
-     * @param array $configOverrides
+     * @param string|string[]|null $selector
+     * @param string|string[]|null $sizes
+     * @param bool|null $base64src
+     * @param array|null $imagerTransformDefaults
+     * @param array|null $imagerConfigOverrides
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws Exception
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function srcset($html, $transforms, $selector = 'img', $sizes = '100w', bool $base64src = false, array $transformDefaults = [], array $configOverrides = [])
+    public function srcset($html, $transforms, $selector = null, $sizes = null, ?bool $base64src = null, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
             return $html;
+        }
+
+        if (empty($selector)) {
+            $selector = 'img';
+        }
+
+        if (empty($sizes)) {
+            $sizes = '100w';
+        }
+
+        if (!is_bool($base64src)) {
+            $base64src = false;
         }
 
         $dom = new RetconDom($html);
@@ -176,7 +191,7 @@ class RetconService extends Component
             $transforms = [$transforms];
         }
 
-        $transforms = \array_reduce($transforms, function ($carry, $transform) {
+        $transforms = \array_reduce($transforms, static function ($carry, $transform) {
             $transform = RetconHelper::getImageTransform($transform);
             if ($transform) {
                 $carry[] = $transform;
@@ -202,8 +217,8 @@ class RetconService extends Component
             }
 
             // Get transformed images
-            $transformedImages = \array_reduce($transforms, function ($carry, $transform) use ($src, $transformDefaults, $configOverrides) {
-                if ($transformedImage = RetconHelper::getTransformedImage($src, $transform, $transformDefaults, $configOverrides)) {
+            $transformedImages = \array_reduce($transforms, static function ($carry, $transform) use ($src, $imagerTransformDefaults, $imagerConfigOverrides) {
+                if ($transformedImage = RetconHelper::getTransformedImage($src, $transform, $imagerTransformDefaults, $imagerConfigOverrides)) {
                     $carry[] = $transformedImage;
                 }
                 return $carry;
@@ -242,18 +257,30 @@ class RetconService extends Component
      * Prepares all images (or all nodes matching the selector(s) passed) by swapping out the `src` attribute with a base64 encoded, transparent SVG. The original source will be retained in a data attribute
      *
      * @param $html
-     * @param string|string[] $selector
-     * @param string $className
-     * @param string $attributeName
+     * @param string|string[]|null $selector
+     * @param string|null $className
+     * @param string|null $attributeName
      * @return string|\Twig\Markup|\Twig\Markup|null
      * @throws Exception
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function lazy($html, $selector = 'img', string $className = 'lazyload', string $attributeName = 'src')
+    public function lazy($html, $selector = null, ?string $className = null, ?string $attributeName = null)
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
             return $html;
+        }
+
+        if (empty($selector)) {
+            $selector = 'img';
+        }
+
+        if (is_null($className)) {
+            $className = 'lazyload';
+        }
+
+        if (empty($attributeName)) {
+            $attributeName = 'src';
         }
 
         $dom = new RetconDom($html);

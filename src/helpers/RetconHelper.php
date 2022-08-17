@@ -122,14 +122,14 @@ class RetconHelper
     /**
      * @param string $src
      * @param string|array $transform
-     * @param array $imagerTransformDefaults
-     * @param array $imagerConfigOverrides
+     * @param array|null $imagerTransformDefaults
+     * @param array|null $imagerConfigOverrides
      * @return object|bool
      * @throws Exception
      * @throws \aelvan\imager\exceptions\ImagerException
      * @throws \craft\errors\ImageException
      */
-    public static function getTransformedImage(string $src, $transform, array $imagerTransformDefaults = [], array $imagerConfigOverrides = [])
+    public static function getTransformedImage(string $src, $transform, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
     {
 
         $imageUrl = Craft::$app->getElements()->parseRefs($src);
@@ -138,7 +138,7 @@ class RetconHelper
         $imagerPlugin = self::getImagerPlugin();
         if ($imagerPlugin) {
             /** @var Imager $imagerPlugin */
-            return $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults, $imagerConfigOverrides);
+            return $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults ?? [], $imagerConfigOverrides ?? []);
         }
 
         /** @var RetconSettings $settings */

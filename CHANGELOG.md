@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## Unreleased - 2022-08-17
+### Changed
+- The `selector`, `sizes`, `base64src`, `className`, `attributeName`, `imagerTransformDefaults` and `imagerConfigOverrides` parameters are now nullable for the `retconTransform`, `retconLazy` and `retconSrcset` filters  
+
 ## 2.4.2 - 2022-04-27  
 ### Fixed  
 - Fixes an exception that would be thrown when setting `style` and `class` attributes with the `retconAttr` filter, using values returned by Twig macros   
