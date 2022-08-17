@@ -13,18 +13,13 @@ namespace mmikkel\retcon\services;
 use Craft;
 use craft\base\Component;
 use craft\base\Element;
-use craft\elements\Asset;
 use craft\helpers\ArrayHelper;
-use craft\helpers\Html;
 use craft\helpers\Template as TemplateHelper;
 
-use mmikkel\retcon\Retcon;
 use mmikkel\retcon\helpers\RetconHelper;
 use mmikkel\retcon\library\RetconDom;
 
 use Symfony\Component\DomCrawler\Crawler;
-
-use Twig\Template;
 
 use yii\base\Exception;
 
@@ -599,7 +594,8 @@ class RetconService extends Component
      * @param $html
      * @param string|string[] $selector
      * @param string $container
-     * @return string|\Twig\Markup|\Twig\Markup|null
+     * @return string|\Twig\Markup|null
+     * @throws \DOMException
      * @throws \craft\errors\SiteNotFoundException
      */
     public function wrap($html, $selector, string $container)
@@ -643,7 +639,7 @@ class RetconService extends Component
      *
      * @param $html
      * @param string|string[] $selector
-     * @return string|\Twig\Markup|\Twig\Markup|null
+     * @return string|\Twig\Markup|null
      * @throws \craft\errors\SiteNotFoundException
      */
     public function unwrap($html, $selector)
@@ -711,7 +707,7 @@ class RetconService extends Component
             $fragment->appendXML($toInject);
             $injectNode = $fragment->childNodes->item(0);
         } else {
-            $textNode = $doc->createTextNode("{$toInject}");
+            $textNode = $doc->createTextNode($toInject);
         }
 
         /** @var \DOMElement $node */

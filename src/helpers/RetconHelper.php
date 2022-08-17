@@ -16,7 +16,6 @@ use mmikkel\retcon\models\RetconSettings;
 use mmikkel\retcon\Retcon;
 
 use Craft;
-use craft\base\Image;
 use craft\base\PluginInterface;
 use craft\helpers\App;
 use craft\helpers\FileHelper;
@@ -73,7 +72,7 @@ class RetconHelper
     {
 
         /** @var Imager|ImagerX|PluginInterface $imagerPlugin */
-        $imagerPlugin = RetconHelper::getImagerPlugin();
+        $imagerPlugin = static::getImagerPlugin();
         $useImager = (bool)$imagerPlugin;
 
         $isCraft4 = \version_compare(Craft::$app->getVersion(), '4.0', '>=');
@@ -83,8 +82,8 @@ class RetconHelper
             // Named transform
             $transformName = $transform;
 
-            if (isset(self::$transforms[$transformName])) {
-                return self::$transforms[$transformName];
+            if (isset(static::$transforms[$transformName])) {
+                return static::$transforms[$transformName];
             }
 
             if ($isCraft4) {
@@ -101,7 +100,7 @@ class RetconHelper
                 }
             }
 
-            self::$transforms[$transformName] = $transform;
+            static::$transforms[$transformName] = $transform;
 
             return $transform;
 
@@ -135,7 +134,7 @@ class RetconHelper
         $imageUrl = Craft::$app->getElements()->parseRefs($src);
 
         // If we can use Imager, we need to do minimal work
-        $imagerPlugin = self::getImagerPlugin();
+        $imagerPlugin = static::getImagerPlugin();
         if ($imagerPlugin) {
             /** @var Imager $imagerPlugin */
             return $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults ?? [], $imagerConfigOverrides ?? []);
@@ -170,7 +169,7 @@ class RetconHelper
         }
 
         // Create transform handle if missing
-        $transformHandle = property_exists($transform, 'handle') && $transform->handle !== null && $transform->handle ? $transform->handle : null;
+        $transformHandle = property_exists($transform, 'handle') && $transform->handle ? $transform->handle : null;
         if (!$transformHandle) {
             $transformFilenameAttributes = [
                 $transformWidth . 'x' . $transformHeight,
@@ -205,13 +204,13 @@ class RetconHelper
         }
 
         // Build filename/path
-        $imageTransformedFilename = self::fixSlashes($imagePathInfo['filename'] . '.' . ($transformFormat ?: $imagePathInfo['extension']));
-        $imageTransformedFolder = self::fixSlashes($basePath . $imagePathInfo['dirname'] . '/_' . $transformHandle);
-        $imageTransformedPath = self::fixSlashes($imageTransformedFolder . '/' . $imageTransformedFilename);
+        $imageTransformedFilename = static::fixSlashes($imagePathInfo['filename'] . '.' . ($transformFormat ?: $imagePathInfo['extension']));
+        $imageTransformedFolder = static::fixSlashes($basePath . $imagePathInfo['dirname'] . '/_' . $transformHandle);
+        $imageTransformedPath = static::fixSlashes($imageTransformedFolder . '/' . $imageTransformedFilename);
 
         // Exit if local file doesn't exist
         $isDevMode = Craft::$app->getConfig()->getGeneral()->devMode;
-        $imagePath = RetconHelper::fixSlashes($basePath . '/' . $imageUrlInfo['path']);
+        $imagePath = static::fixSlashes($basePath . '/' . $imageUrlInfo['path']);
 
         if (!\file_exists($imagePath)) {
             if ($isDevMode) {
@@ -252,7 +251,7 @@ class RetconHelper
 
         }
 
-        $imageTransformedUrl = self::fixSlashes(\str_replace($basePath, $baseUrl, $imageTransformedPath));
+        $imageTransformedUrl = static::fixSlashes(\str_replace($basePath, $baseUrl, $imageTransformedPath));
 
         return (object)[
             'url' => $imageTransformedUrl,
@@ -294,7 +293,7 @@ class RetconHelper
             ];
         }
 
-        $imageUrl = (string)RetconHelper::parseRef($img->getAttribute('src'));
+        $imageUrl = (string)static::parseRef($img->getAttribute('src'));
         if ($imageUrl === '' || $imageUrl === '0') {
             return null;
         }
@@ -316,7 +315,7 @@ class RetconHelper
             return null;
         }
 
-        $imageAbsolutePath = self::fixSlashes($basePath . '/' . $imagePath);
+        $imageAbsolutePath = static::fixSlashes($basePath . '/' . $imagePath);
         if (!\file_exists($imageAbsolutePath) || \is_dir($imageAbsolutePath)) {
             return null;
         }
