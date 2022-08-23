@@ -276,15 +276,17 @@ class RetconHelper
     }
 
     /**
+     * Get image dimensions for an img DOM node
+     *
      * @param \DOMNode $img
-     * @return array|null
+     * @return int[]|null
      * @throws Exception
      */
     public static function getImageDimensions(\DOMNode $img): ?array
     {
 
-        $width = $img->getAttribute('width') ?: null;
-        $height = $img->getAttribute('height') ?: null;
+        $width = (int)($img->getAttribute('width') ?: null);
+        $height = (int)($img->getAttribute('height') ?: null);
 
         if ($width && $height) {
             return [
@@ -320,7 +322,18 @@ class RetconHelper
             return null;
         }
 
-        [$width, $height] = \getimagesize($imageAbsolutePath);
+        $imageSize = \getimagesize($imageAbsolutePath) ?: [];
+
+        if (empty($imageSize)) {
+            return null;
+        }
+
+        $width = (int)($imageSize[0] ?? null);
+        $height = (int)($imageSize[1] ?? null);
+
+        if (!$width || !$height) {
+            return null;
+        }
 
         return [
             'width' => $width,

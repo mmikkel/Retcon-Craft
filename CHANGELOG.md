@@ -1,5 +1,14 @@
 # Retcon Changelog
 
+## 2.5.0 - 2022-08-23
+
+### Fixed  
+- Fixed a PHP exception that could occur when Retcon was unable to get the dimensions for an image being transformed  
+- Fixed a bug where the `retconTransform` filter would not apply missing `width` and `height` attributes to the `img` tags being transformed
+
+### Added  
+- The `retconSrcset` filter now sets `img` tags `width` and `height` attributes, if they are missing in the markup and Retcon is able to read out the dimensions  
+
 ## 2.4.3 - 2022-08-17
 ### Changed
 - The `selector`, `sizes`, `base64src`, `className`, `attributeName`, `imagerTransformDefaults` and `imagerConfigOverrides` parameters are now nullable for the `retconTransform`, `retconLazy` and `retconSrcset` filters  

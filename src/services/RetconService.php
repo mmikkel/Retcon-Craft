@@ -127,13 +127,25 @@ class RetconService extends Component
 
             $node->setAttribute('src', $transformedImage->url);
 
-            if ($node->getAttribute('width') !== '' && $node->getAttribute('width') !== '0') {
-                $node->setAttribute('width', $transformedImage->width);
+            // Should we set width and height attributes?
+            $nodeWidth = (int)$node->getAttribute('width');
+            $nodeHeight = (int)$node->getAttribute('height');
+
+            if ($nodeWidth || $nodeHeight) {
+                continue;
             }
 
-            if ($node->getAttribute('height') !== '' && $node->getAttribute('height') !== '0') {
-                $node->setAttribute('height', $transformedImage->height);
+            $transformedImageDimensions = RetconHelper::getImageDimensions($node) ?? [];
+
+            $width = $transformedImageDimensions['width'] ?? null;
+            $height = $transformedImageDimensions['height'] ?? null;
+
+            if (!$width || !$height) {
+                continue;
             }
+
+            $node->setAttribute('width', $width);
+            $node->setAttribute('height', $height);
 
         }
 
@@ -233,15 +245,27 @@ class RetconService extends Component
 
             $node->setAttribute('src', RetconHelper::parseRef($src));
 
-            // Swap out the src for a base64 encoded SVG?
-            if (!$base64src) {
+            // Set dimensions?
+            $nodeWidth = (int)$node->getAttribute('width');
+            $nodeHeight = (int)$node->getAttribute('height');
+
+            if (($nodeWidth && $nodeHeight) && !$base64src) {
                 continue;
             }
 
             $dimensions = RetconHelper::getImageDimensions($node) ?? [];
-            $width = $dimensions['width'] ?: 1;
-            $height = $dimensions['height'] ?: 1;
-            $node->setAttribute('src', RetconHelper::getBase64Pixel($width, $height));
+            $width = $dimensions['width'] ?? null;
+            $height = $dimensions['height'] ?? null;
+
+            // Set width and height attributes
+            if (!$nodeWidth && !$nodeHeight && $width && $height) {
+                $node->setAttribute('width', $width);
+                $node->setAttribute('height', $height);
+            }
+
+            if ($base64src) {
+                $node->setAttribute('src', RetconHelper::getBase64Pixel($width ?? 1, $height ?? 11));
+            }
         }
 
         return $dom->getHtml();
@@ -297,18 +321,20 @@ class RetconService extends Component
             $node->setAttribute($attributeName, RetconHelper::parseRef($node->getAttribute('src')));
 
             $dimensions = RetconHelper::getImageDimensions($node) ?? [];
-            $width = $dimensions['width'] ?: 1;
-            $height = $dimensions['height'] ?: 1;
 
-            $node->setAttribute('src', RetconHelper::getBase64Pixel($width, $height));
+            $width = $dimensions['width'] ?? null;
+            $height = $dimensions['height'] ?? null;
 
-            if ($width) {
+            $nodeWidth = (int)$node->getAttribute('width');
+            $nodeHeight = (int)$node->getAttribute('height');
+
+            if ($width && $height && !$nodeWidth && !$nodeHeight) {
                 $node->setAttribute('width', $width);
-            }
-
-            if ($height) {
                 $node->setAttribute('height', $height);
             }
+
+            $node->setAttribute('src', RetconHelper::getBase64Pixel($width ?? 1, $height ?? 1));
+
         }
 
         return $dom->getHtml();
