@@ -1,7 +1,10 @@
 # Retcon Changelog
 
-## 2.5.0 - 2022-08-23
+## 2.6.0 - 2022-10-12
+### Changed
+- Updated version constraints for the `symfony/dom-crawler` and `symfony/css-selector` dependencies, allowing their 6.0 packages  
 
+## 2.5.0 - 2022-08-23
 ### Fixed  
 - Fixed a PHP exception that could occur when Retcon was unable to get the dimensions for an image being transformed  
 - Fixed a bug where the `retconTransform` filter would not apply missing `width` and `height` attributes to the `img` tags being transformed
