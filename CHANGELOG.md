@@ -1,6 +1,6 @@
 # Retcon Changelog
 
-## Unreleased
+## 2.6.1 - 2023-02-17
 ### Fixed
 - Fixes a PHP exception that would be thrown when using the `retconChange` filter on empty DOM nodes  
 
