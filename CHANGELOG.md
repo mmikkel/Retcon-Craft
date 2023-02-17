@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## Unreleased
+### Fixed
+- Fixes a PHP exception that would be thrown when using the `retconChange` filter on empty DOM nodes  
+
 ## 2.6.0 - 2022-10-12
 ### Changed
 - Updated version constraints for the `symfony/dom-crawler` and `symfony/css-selector` dependencies, allowing their 6.0 packages  

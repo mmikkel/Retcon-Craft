@@ -605,7 +605,9 @@ class RetconService extends Component
                 foreach ($node->attributes as $attribute) {
                     $newElement->setAttribute($attribute->nodeName, $attribute->nodeValue);
                 }
-                $newElement->appendChild($fragment);
+                if ($fragment->childNodes->length) {
+                    $newElement->appendChild($fragment);
+                }
                 $node->parentNode->replaceChild($newElement, $node);
             }
         }
