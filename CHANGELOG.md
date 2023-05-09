@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## Unreleased
+### Fixed
+- Fixes an issue where the `retconRemoveEmpty` filter would remove self-closing tags.  
+
 ## 2.6.1 - 2023-02-17
 ### Fixed
 - Fixes a PHP exception that would be thrown when using the `retconChange` filter on empty DOM nodes  

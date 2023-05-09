@@ -789,10 +789,22 @@ class RetconService extends Component
         /** @var Crawler $crawler */
         $crawler = $nodes ?? $dom->getCrawler();
 
-        $xpathQuery = $removeBr ? '//*[not(normalize-space())]' : '//*[not(self::br)][not(normalize-space())]';
+        // Exclude self-closing tags from being removed
+        $excludedTags = ['area', 'base', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
 
-        $crawler->filterXPath($xpathQuery)->each(function (Crawler $crawler) {
-            if (($node = $crawler->getNode(0)) === null || !$node->parentNode instanceof \DOMNode) {
+        // Retain linebreaks too?
+        if (!$removeBr) {
+            $excludedTags[] = 'br';
+        }
+
+        $excludedTagsQuery = '//' . implode('|//', $excludedTags);
+
+        $crawler->filterXPath('//*[not(normalize-space())]')->each(function (Crawler $crawler) use ($excludedTagsQuery) {
+            if (
+                ($node = $crawler->getNode(0)) === null ||
+                !$node->parentNode instanceof \DOMNode ||
+                $crawler->filterXPath($excludedTagsQuery)->getNode(0)
+            ) {
                 return;
             }
             $node->parentNode->removeChild($node);
