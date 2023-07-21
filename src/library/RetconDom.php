@@ -9,11 +9,15 @@
 namespace mmikkel\retcon\library;
 
 use Craft;
+use craft\errors\SiteNotFoundException;
 use craft\helpers\Template;
 use craft\redactor\FieldData;
 
 use Masterminds\HTML5;
+
 use Symfony\Component\DomCrawler\Crawler;
+
+use Twig\Markup;
 
 class RetconDom
 {
@@ -47,7 +51,7 @@ class RetconDom
         $libxmlUseInternalErrors = \libxml_use_internal_errors(true);
         $content = \mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset());
         $this->doc = new \DOMDocument();
-        $this->doc->loadHTML("<html>$content</html>", LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $this->doc->loadHTML("<html><retcon>$content</retcon></html>", LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $this->crawler = new Crawler($this->doc);
         $this->html5 = new HTML5([
             'encode_entities' => false,
@@ -107,11 +111,18 @@ class RetconDom
     }
 
     /**
-     * @return \Twig\Markup|\Twig\Markup
-     * @throws \craft\errors\SiteNotFoundException
+     * @return Markup
+     * @throws SiteNotFoundException
      */
     public function getHtml()
     {
+        // Unwrap the <retcon> wrapper node
+        $rootNode = $this->doc->documentElement->firstChild;
+        $fragment = $this->doc->createDocumentFragment();
+        while ($rootNode->childNodes->length > 0) {
+            $fragment->appendChild($rootNode->childNodes->item(0));
+        }
+        $rootNode->parentNode->replaceChild($fragment, $rootNode);
         $html = $this->html5->saveHTML($this->doc);
         $html = \preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html);
         return Template::raw(Craft::$app->getElements()->parseRefs((string)$html));

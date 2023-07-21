@@ -2,11 +2,12 @@
 
 ## Unreleased
 ### Fixed
-- Fixes an issue where the `retconRemoveEmpty` filter would remove self-closing tags.  
+- Fixed an issue where the `retconRemoveEmpty` filter would remove self-closing tags.  
+- Fixed an issue where DOMDocument could wrap text nodes in `<p>` tags.
 
 ## 2.6.1 - 2023-02-17
 ### Fixed
-- Fixes a PHP exception that would be thrown when using the `retconChange` filter on empty DOM nodes  
+- Fixed a PHP exception that would be thrown when using the `retconChange` filter on empty DOM nodes  
 
 ## 2.6.0 - 2022-10-12
 ### Changed
