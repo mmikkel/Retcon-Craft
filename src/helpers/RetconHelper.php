@@ -139,6 +139,8 @@ class RetconHelper
     public static function getTransformedImage(string $src, $transform, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null): ?RetconTransformedImage
     {
 
+        // TODO: In Retcon 3.0, we should try to get the asset via RetconHelper::getAssetFromRef(), and transform that directly
+        // I.e. via `$asset->getUrl($transform)` or by passing the asset to Imager
         $imageUrl = Craft::$app->getElements()->parseRefs($src);
 
         // If we can use Imager, we need to do minimal work
