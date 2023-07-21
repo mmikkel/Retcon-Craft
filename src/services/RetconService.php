@@ -15,6 +15,7 @@ use craft\errors\ImageException;
 use craft\errors\ImageTransformException;
 use craft\errors\SiteNotFoundException;
 use craft\helpers\ArrayHelper;
+use craft\helpers\StringHelper;
 use craft\helpers\Template as TemplateHelper;
 
 use mmikkel\retcon\helpers\RetconHelper;
@@ -376,7 +377,7 @@ class RetconService extends Component
                 continue;
             }
             $src = $node->getAttribute('src');
-            if (!$src) {
+            if (!$src || StringHelper::isBase64($src) || StringHelper::startsWith($src, 'data:')) {
                 continue;
             }
             $alt = null;
@@ -389,6 +390,7 @@ class RetconService extends Component
                 }
                 $alt = $alt ?: $asset->title;
             }
+            // TODO: Stop using the filename as alt text in Retcon 3.0!
             $alt = $alt ?: \pathinfo($src, PATHINFO_FILENAME);
             $node->setAttribute('alt', $alt);
         }
