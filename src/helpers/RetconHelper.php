@@ -161,11 +161,11 @@ class RetconHelper
             }
             /** @var Imager|ImagerX $imagerPlugin */
             $transformedImage = $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults ?? [], $imagerConfigOverrides ?? []);
+            if (empty($transformedImage)) {
+                return null;
+            }
             if (is_array($transformedImage)) {
                 $transformedImage = $transformedImage[0] ?? null;
-            }
-            if (!$transformedImage) {
-                return null;
             }
             return new RetconTransformedImage([
                 'url' => $transformedImage->getUrl(),
