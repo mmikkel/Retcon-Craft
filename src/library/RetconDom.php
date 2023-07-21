@@ -118,11 +118,13 @@ class RetconDom
     {
         // Unwrap the <retcon> wrapper node
         $rootNode = $this->doc->documentElement->firstChild;
-        $fragment = $this->doc->createDocumentFragment();
-        while ($rootNode->childNodes->length > 0) {
-            $fragment->appendChild($rootNode->childNodes->item(0));
+        if ($rootNode) {
+            $fragment = $this->doc->createDocumentFragment();
+            while ($rootNode->childNodes->length > 0) {
+                $fragment->appendChild($rootNode->childNodes->item(0));
+            }
+            $rootNode->parentNode->replaceChild($fragment, $rootNode);
         }
-        $rootNode->parentNode->replaceChild($fragment, $rootNode);
         $html = $this->html5->saveHTML($this->doc);
         $html = \preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $html);
         return Template::raw(Craft::$app->getElements()->parseRefs((string)$html));
