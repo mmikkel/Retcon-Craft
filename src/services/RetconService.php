@@ -10,9 +10,10 @@
 
 namespace mmikkel\retcon\services;
 
-use Craft;
 use craft\base\Component;
-use craft\base\Element;
+use craft\errors\ImageException;
+use craft\errors\ImageTransformException;
+use craft\errors\SiteNotFoundException;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Template as TemplateHelper;
 
@@ -20,6 +21,8 @@ use mmikkel\retcon\helpers\RetconHelper;
 use mmikkel\retcon\library\RetconDom;
 
 use Symfony\Component\DomCrawler\Crawler;
+
+use Twig\Markup;
 
 use yii\base\Exception;
 
@@ -83,11 +86,11 @@ class RetconService extends Component
      * @param string|string[]|null $selector
      * @param array|null $imagerTransformDefaults
      * @param array|null $imagerConfigOverrides
-     * @return string|\Twig\Markup|null
+     * @return string|Markup|null
      * @throws Exception
-     * @throws \craft\errors\ImageException
-     * @throws \craft\errors\ImageTransformException
-     * @throws \craft\errors\SiteNotFoundException
+     * @throws ImageException
+     * @throws ImageTransformException
+     * @throws SiteNotFoundException
      */
     public function transform($html, $transform, $selector = null, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
     {
@@ -163,9 +166,9 @@ class RetconService extends Component
      * @param bool|null $base64src
      * @param array|null $imagerTransformDefaults
      * @param array|null $imagerConfigOverrides
-     * @return string|\Twig\Markup|\Twig\Markup|null
+     * @return string|Markup|null
      * @throws Exception
-     * @throws \craft\errors\SiteNotFoundException
+     * @throws SiteNotFoundException
      */
     public function srcset($html, $transforms, $selector = null, $sizes = null, ?bool $base64src = null, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
     {
@@ -279,9 +282,9 @@ class RetconService extends Component
      * @param string|string[]|null $selector
      * @param string|null $className
      * @param string|null $attributeName
-     * @return string|\Twig\Markup|\Twig\Markup|null
+     * @return string|Markup|null
      * @throws Exception
-     * @throws \craft\errors\SiteNotFoundException
+     * @throws SiteNotFoundException
      */
     public function lazy($html, $selector = null, ?string $className = null, ?string $attributeName = null)
     {
@@ -348,8 +351,8 @@ class RetconService extends Component
      * @param string|string[] $selector
      * @param string|null $field
      * @param bool $overwrite
-     * @return \Twig\Markup|\Twig\Markup
-     * @throws \craft\errors\SiteNotFoundException
+     * @return Markup|string
+     * @throws SiteNotFoundException
      */
     public function autoAlt($html, $selector = 'img', string $field = null, bool $overwrite = false)
     {
@@ -401,8 +404,8 @@ class RetconService extends Component
      * @param string|string[] $selector
      * @param array $attributes
      * @param string|bool $overwrite (true, false, "prepend" or "append")
-     * @return string|\Twig\Markup|\Twig\Markup|null
-     * @throws \craft\errors\SiteNotFoundException
+     * @return string|Markup|null
+     * @throws SiteNotFoundException
      */
     public function attr($html, $selector, array $attributes, $overwrite = true)
     {
@@ -462,8 +465,8 @@ class RetconService extends Component
      * @param $html
      * @param string|string[] $selector
      * @param array $attributes
-     * @return string|\Twig\Markup|\Twig\Markup|null
-     * @throws \craft\errors\SiteNotFoundException
+     * @return string|Markup|null
+     * @throws SiteNotFoundException
      */
     public function renameAttr($html, $selector, array $attributes)
     {
@@ -500,8 +503,8 @@ class RetconService extends Component
      *
      * @param $html
      * @param string|string[] $selector
-     * @return string|\Twig\Markup|\Twig\Markup|null
-     * @throws \craft\errors\SiteNotFoundException
+     * @return string|Markup|null
+     * @throws SiteNotFoundException
      */
     public function remove($html, $selector)
     {
@@ -531,8 +534,8 @@ class RetconService extends Component
      *
      * @param $html
      * @param string|string[] $selector
-     * @return string|\Twig\Markup|\Twig\Markup|null
-     * @throws \craft\errors\SiteNotFoundException
+     * @return string|Markup|null
+     * @throws SiteNotFoundException
      */
     public function only($html, $selector)
     {
@@ -570,8 +573,8 @@ class RetconService extends Component
      * @param $html
      * @param string|string[] $selector
      * @param string $toTag
-     * @return string|\Twig\Markup|\Twig\Markup|null
-     * @throws \craft\errors\SiteNotFoundException
+     * @return string|Markup|null
+     * @throws SiteNotFoundException
      */
     public function change($html, $selector, string $toTag)
     {
@@ -624,9 +627,9 @@ class RetconService extends Component
      * @param $html
      * @param string|string[] $selector
      * @param string $container
-     * @return string|\Twig\Markup|null
+     * @return string|Markup|null
      * @throws \DOMException
-     * @throws \craft\errors\SiteNotFoundException
+     * @throws SiteNotFoundException
      */
     public function wrap($html, $selector, string $container)
     {
@@ -669,8 +672,8 @@ class RetconService extends Component
      *
      * @param $html
      * @param string|string[] $selector
-     * @return string|\Twig\Markup|null
-     * @throws \craft\errors\SiteNotFoundException
+     * @return string|Markup|null
+     * @throws SiteNotFoundException
      */
     public function unwrap($html, $selector)
     {
@@ -716,8 +719,8 @@ class RetconService extends Component
      * @param string|string[] $selector
      * @param string $toInject
      * @param bool $overwrite
-     * @return string|\Twig\Markup|\Twig\Markup|null
-     * @throws \craft\errors\SiteNotFoundException
+     * @return string|Markup|null
+     * @throws SiteNotFoundException
      */
     public function inject($html, $selector, string $toInject, bool $overwrite = false)
     {
@@ -773,8 +776,8 @@ class RetconService extends Component
      * @param $html
      * @param string|string[]|null $selector
      * @param bool $removeBr
-     * @return string|\Twig\Markup|\Twig\Markup|null
-     * @throws \craft\errors\SiteNotFoundException
+     * @return string|Markup|null
+     * @throws SiteNotFoundException
      */
     public function removeEmpty($html, $selector = null, bool $removeBr = false)
     {
