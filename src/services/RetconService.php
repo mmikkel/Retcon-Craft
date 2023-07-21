@@ -828,4 +828,58 @@ class RetconService extends Component
         return $dom->getHtml();
     }
 
+    /**
+     * Sets width and height attributes for image nodes, if they are missing
+     *
+     * @param $html
+     * @param string|string[]|null $selector
+     * @return string|Markup|null
+     * @throws Exception
+     */
+    public function dimensions($html, $selector = null)
+    {
+
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
+            return $html;
+        }
+
+        if (empty($selector)) {
+            $selector = 'img';
+        }
+
+        $dom = new RetconDom($html);
+        $nodes = $dom->filter($selector);
+
+        if (empty($nodes)) {
+            return TemplateHelper::raw($html);
+        }
+
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
+
+            $nodeWidth = (int)$node->getAttribute('width');
+            $nodeHeight = (int)$node->getAttribute('height');
+
+            if ($nodeWidth && $nodeHeight) {
+                continue;
+            }
+
+            $dimensions = RetconHelper::getImageDimensions($node) ?? [];
+
+            $width = $dimensions['width'] ?? null;
+            $height = $dimensions['height'] ?? null;
+
+            if (!$width || !$height) {
+                continue;
+            }
+
+            $node->setAttribute('width', $width);
+            $node->setAttribute('height', $height);
+
+        }
+
+        return $dom->getHtml();
+
+    }
+
 }

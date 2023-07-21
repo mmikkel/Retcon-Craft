@@ -2,6 +2,7 @@
 
 ## Unreleased
 ### Added
+- Added a new `retconDimensions` filter, which can be used to set missing `width` and `height` attributes for image nodes.  
 - Added a new `$allowFilenameAsAltText` parameter to the `retconAutoAlt` filter (default `true`; will be default `false` in Retcon 3.0).  
 - Added `RetconTransformedImage` model.  
 ### Improved

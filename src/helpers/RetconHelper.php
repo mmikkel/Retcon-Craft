@@ -155,7 +155,7 @@ class RetconHelper
             $safeFileFormats = array_map(static function (string $extension) {
                 return strtolower($extension);
             }, $imagerSettings->safeFileFormats ?? ['jpg', 'jpeg', 'gif', 'png']);
-            $extension = strtolower(pathinfo($imageUrl, PATHINFO_EXTENSION));
+            $extension = strtolower(/** @scrutinizer ignore-type */ pathinfo($imageUrl, PATHINFO_EXTENSION));
             if (!in_array($extension, $safeFileFormats)) {
                 return null;
             }
@@ -352,6 +352,7 @@ class RetconHelper
         }
 
         $imageAbsolutePath = static::fixSlashes($basePath . '/' . $imagePath);
+
         if (!\file_exists($imageAbsolutePath) || \is_dir($imageAbsolutePath)) {
             return null;
         }
