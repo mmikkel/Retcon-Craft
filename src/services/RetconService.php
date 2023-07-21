@@ -346,15 +346,15 @@ class RetconService extends Component
      *
      * @param $html
      * @param string|string[] $selector
-     * @param string $field
+     * @param string|null $field
      * @param bool $overwrite
      * @return \Twig\Markup|\Twig\Markup
      * @throws \craft\errors\SiteNotFoundException
      */
-    public function autoAlt($html, $selector = 'img', string $field = 'title', bool $overwrite = false)
+    public function autoAlt($html, $selector = 'img', string $field = null, bool $overwrite = false)
     {
 
-        if (!RetconHelper::getHtmlFromParam($html)) {
+        if (!$html = RetconHelper::getHtmlFromParam($html)) {
             return $html;
         }
 
@@ -365,6 +365,8 @@ class RetconService extends Component
             return TemplateHelper::raw($html);
         }
 
+        $isCraft4 = version_compare(\Craft::$app->getVersion(), '4.0.0', '>=');
+
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
             if ($node->getAttribute('alt') && !$overwrite) {
@@ -374,17 +376,17 @@ class RetconService extends Component
             if (!$src) {
                 continue;
             }
-            $elementId = RetconHelper::getElementIdFromRef($src);
-            /** @var Element $element */
-            $element = $elementId ? Craft::$app->getElements()->getElementById($elementId) : null;
             $alt = null;
-            if ($element) {
-                $alt = $element->$field ?: $element->title ?: null;
+            if ($asset = RetconHelper::getAssetFromRef($src)) {
+                if ($field) {
+                    $alt = $asset->$field ?? '';
+                }
+                if (!$alt && $isCraft4) {
+                    $alt = $asset->alt ?? '';
+                }
+                $alt = $alt ?: $asset->title;
             }
-            if (!$alt) {
-                $imageSourcePathinfo = \pathinfo($src);
-                $alt = $imageSourcePathinfo['filename'] ?? '';
-            }
+            $alt = $alt ?: \pathinfo($src, PATHINFO_FILENAME);
             $node->setAttribute('alt', $alt);
         }
 

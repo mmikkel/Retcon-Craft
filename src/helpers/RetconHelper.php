@@ -10,6 +10,7 @@ namespace mmikkel\retcon\helpers;
 
 use aelvan\imager\Imager;
 
+use craft\elements\Asset;
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
@@ -25,6 +26,9 @@ use craft\helpers\ImageTransforms;
 use craft\helpers\StringHelper;
 use craft\helpers\Template as TemplateHelper;
 use craft\helpers\UrlHelper;
+
+use craft\redactor\FieldData as RedactorFieldData;
+use craft\htmlfield\HtmlFieldData;
 
 use Twig\Markup;
 
@@ -45,7 +49,11 @@ class RetconHelper
      */
     public static function getHtmlFromParam($value): ?string
     {
-        $html = (string)$value;
+        if ($value instanceof RedactorFieldData || $value instanceof HtmlFieldData) {
+            $html = $value->getRawContent();
+        } else {
+            $html = (string)$value;
+        }
         if (!\preg_replace('/\s+/', '', $value)) {
             return null;
         }
@@ -404,18 +412,18 @@ class RetconHelper
 
     /**
      * @param string $ref
-     * @return int|null
+     * @return Asset|null
      */
-    public static function getElementIdFromRef(string $ref): ?int
+    public static function getAssetFromRef(string $ref): ?Asset
     {
         if ($ref[0] !== '{' || $ref[strlen($ref) - 1] !== '}') {
             return null;
         }
         $refSegments = \explode(':', \strtr($ref, ['{' => '', '}' => '']));
-        if (\count($refSegments) !== 3 || !($id = (int)$refSegments[1] ?? null)) {
+        if (count($refSegments) < 2 || $refSegments[0] !== 'asset' || !($id = (int)$refSegments[1] ?? null)) {
             return null;
         }
-        return $id;
+        return Asset::find()->id($id)->one();
     }
 
     /**

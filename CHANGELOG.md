@@ -1,10 +1,15 @@
 # Retcon Changelog
 
 ## Unreleased
+### Improved
+- Improved support for CKEditor.
+### Changed
+- The `autoAlt` filter now uses the native `alt` attribute if it has a value (Craft 4 only).
 ### Fixed
 - Fixed an issue where the `retconRemoveEmpty` filter would remove self-closing tags.  
 - Fixed an issue where DOMDocument could wrap text nodes in `<p>` tags.
-- Fixed an issue where the `retconUnwrap` filter could unwrap root nodes
+- Fixed an issue where the `retconUnwrap` filter could unwrap root nodes.
+- Fixed an issue where the `autoAlt` filter was unable to retrieve alt value from the source asset.
 
 ## 2.6.1 - 2023-02-17
 ### Fixed
