@@ -11,6 +11,7 @@ namespace mmikkel\retcon\helpers;
 use aelvan\imager\Imager;
 
 use craft\elements\Asset;
+use mmikkel\retcon\models\RetconTransformedImage;
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
@@ -125,18 +126,17 @@ class RetconHelper
         return Craft::$app->getAssetTransforms()->normalizeTransform($transform);
     }
 
-
     /**
      * @param string $src
-     * @param string|array $transform
+     * @param $transform
      * @param array|null $imagerTransformDefaults
      * @param array|null $imagerConfigOverrides
-     * @return object|bool
+     * @return RetconTransformedImage|null
      * @throws Exception
-     * @throws \aelvan\imager\exceptions\ImagerException
      * @throws \craft\errors\ImageException
+     * @throws \spacecatninja\imagerx\exceptions\ImagerException
      */
-    public static function getTransformedImage(string $src, $transform, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
+    public static function getTransformedImage(string $src, $transform, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null): ?RetconTransformedImage
     {
 
         $imageUrl = Craft::$app->getElements()->parseRefs($src);
@@ -144,8 +144,19 @@ class RetconHelper
         // If we can use Imager, we need to do minimal work
         $imagerPlugin = static::getImagerPlugin();
         if ($imagerPlugin) {
-            /** @var Imager $imagerPlugin */
-            return $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults ?? [], $imagerConfigOverrides ?? []);
+            /** @var Imager|ImagerX $imagerPlugin */
+            $transformedImage = $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults ?? [], $imagerConfigOverrides ?? []);
+            if (is_array($transformedImage)) {
+                $transformedImage = $transformedImage[0] ?? null;
+            }
+            if (!$transformedImage) {
+                return null;
+            }
+            return new RetconTransformedImage([
+                'url' => $transformedImage->getUrl(),
+                'width' => $transformedImage->getWidth(),
+                'height' => $transformedImage->getHeight(),
+            ]);
         }
 
         /** @var RetconSettings $settings */
@@ -200,7 +211,7 @@ class RetconHelper
         // Check extension
         $allowedExtensions = ImageHelper::webSafeFormats();
         if (!isset($imagePathInfo['extension']) || !\in_array(\strtolower($imagePathInfo['extension']), $allowedExtensions)) {
-            return false;
+            return null;
         }
 
         // Is image local?
@@ -208,7 +219,7 @@ class RetconHelper
 
         if (!$imageIsLocal) {
             // Non-local images not supported – use Imager!
-            return false;
+            return null;
         }
 
         // Build filename/path
@@ -217,7 +228,7 @@ class RetconHelper
         $imageTransformedPath = static::fixSlashes($imageTransformedFolder . '/' . $imageTransformedFilename);
 
         // Exit if local file doesn't exist
-        $isDevMode = Craft::$app->getConfig()->getGeneral()->devMode;
+        $isDevMode = YII_DEBUG;
         $imagePath = static::fixSlashes($basePath . '/' . $imageUrlInfo['path']);
 
         if (!\file_exists($imagePath)) {
@@ -226,7 +237,7 @@ class RetconHelper
                     'path' => $imagePath,
                 ]));
             }
-            return false;
+            return null;
         }
 
         // We can haz folder?
@@ -261,11 +272,11 @@ class RetconHelper
 
         $imageTransformedUrl = static::fixSlashes(\str_replace($basePath, $baseUrl, $imageTransformedPath));
 
-        return (object)[
+        return new RetconTransformedImage([
             'url' => $imageTransformedUrl,
             'width' => $transformWidth,
             'height' => $transformHeight,
-        ];
+        ]);
 
     }
 
