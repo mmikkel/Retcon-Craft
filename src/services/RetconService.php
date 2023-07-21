@@ -352,10 +352,11 @@ class RetconService extends Component
      * @param string|string[] $selector
      * @param string|null $field
      * @param bool $overwrite
+     * @param bool $allowFilenameAsAltText TODO default to false in Retcon 3.0
      * @return Markup|string
      * @throws SiteNotFoundException
      */
-    public function autoAlt($html, $selector = 'img', string $field = null, bool $overwrite = false)
+    public function autoAlt($html, $selector = 'img', string $field = null, bool $overwrite = false, bool $allowFilenameAsAltText = true)
     {
 
         if (!$html = RetconHelper::getHtmlFromParam($html)) {
@@ -391,8 +392,10 @@ class RetconService extends Component
                 $alt = $alt ?: $asset->title;
             }
             // TODO: Stop using the filename as alt text in Retcon 3.0!
-            $alt = $alt ?: \pathinfo($src, PATHINFO_FILENAME);
-            $node->setAttribute('alt', $alt);
+            if (!$alt && $allowFilenameAsAltText) {
+                $alt = \pathinfo($src, PATHINFO_FILENAME);
+            }
+            $node->setAttribute('alt', $alt ?: '');
         }
 
         return $dom->getHtml();
