@@ -2,7 +2,7 @@
 
 Retcon is a tiny Craft CMS plugin adding a series of powerful Twig filters for modifying HTML content. **Here are some of the things Retcon can do:**
 
-* Add attributes (e.g. `class="foobar"`, `style="color:red;"` or `data-foo`)
+* Add attributes (e.g. `class="foobar"`, `style="color:red;"` or `data-foo`) using CSS selectors (e.g. `'img'`, `'div.foobar'`, `'p:first-child'` etc)  
 * Append values to existing attributes
 * Remove attributes completely (e.g. removing all inline `style` attributes)
 * Transform inline images (it even uses [Imager](https://github.com/aelvan/Imager-Craft), if installed)
@@ -49,7 +49,7 @@ Retcon 2.x is almost completely backwards compatible with Retcon 1.x. These are 
 
 * Retcon now has full HTML5 support, courtesy of [Masterminds](https://github.com/Masterminds/html5-php).
 
-* The `autoAlt` method now uses the Asset's `title` attribute for the `alt` attribute, if Retcon is fed HTML with Craft CMS [reference tags](https://docs.craftcms.com/v2/reference-tags.html).
+* The `autoAlt` method now uses the Asset's native `alt` (Craft 4 only) or `title` attributes for the `alt` attribute, if Retcon is fed HTML with Craft CMS [reference tags](https://docs.craftcms.com/v2/reference-tags.html) (typically, content from a Redactor or CKEditor field).  
 
 * The `transform`, `lazy` and `srcset` now takes an optional `$selector` parameter (`'img'` by default)
 
@@ -57,7 +57,9 @@ Retcon 2.x is almost completely backwards compatible with Retcon 1.x. These are 
 
 * The new `removeEmpty` method removes empty nodes (i.e., nodes that have no text content). Those pesky clients hitting Enter again and again won't know what hit them.
 
-* The `replace` method has been removed. So sorry, it just didn't belong...
+* The `replace` method has been removed. So sorry, it just didn't belong...  
+
+* A new `dimensions` filter has been added, which can add missing `width` and `height` attributes to image nodes (Retcon 2.7+).  
 
 ## Basic usage
 
@@ -67,7 +69,7 @@ Note that it doesn't matter if your HTML is from a WYSIWYG field (Redactor or CK
 
 ### Twig filters
 
-All of Retcon's methods are exposed as Twig filters, which is how Retcon is primarily meant to be used. For example, if you wanted to add a classname `'image'` to all images in a Redactor field called `body`, here's how that'd look:
+All of Retcon's methods are exposed as Twig filters, which is how Retcon is primarily designed to be used. For example, if you wanted to add a classname `'image'` to all images in a Redactor field called `body`, here's how that'd look:
 
 ```twig
 {{ entry.body | retconAttr('img', { class: 'image' }) }}
@@ -105,11 +107,11 @@ Another option is to use the "catch-all" filter `retcon`, which takes a single a
 
 ### PHP
 
-If you want to use Retcon in a Craft plugin or module, all methods are also available through the `mmikkel/retcon/Retcon::$plugin->retcon` service (note that unlike the Twig filters, the `retcon` prefix is missing from the service method names – in other words, `retconAttr` is just `attr`):
+If you want to use Retcon in a Craft plugin or module, all methods are also available through the `mmikkel/retcon/Retcon::getInstance()->retcon` service (note that unlike the Twig filters, the `retcon` prefix is missing from the service method names – in other words, `retconAttr` is just `attr()`):
 
 ```php
 use mmikkel\retcon\Retcon;
-echo Retcon::getInstance()->retcon->attr($entry->body, [ 'class' => 'image' ]);
+echo Retcon::getInstance()->retcon->attr($entry->body, ['class' => 'image']);
 ```
 
 For an actual use case example; here's how the `rel="noopener noreferrer"` example could look in a module (basically, the below code would add `rel="noopener noreferrer"` automatically to _all_ `<a target="_blank">` tags in your templates (unless they've already got a `rel` attribute set, of course):
@@ -163,6 +165,9 @@ Apply an array of named or inline image transform to all images, for simple srcs
 **[lazy](https://github.com/mmikkel/Retcon-Craft/wiki/Lazy)**
 Replaces the _src_ attribute of image tags with a transparent, base64 encoded SVG (retaining the original image's aspect ratio); putting the original src URL in a data-attribute
 
+**[dimensions](https://github.com/mmikkel/Retcon-Craft/wiki/Dimensions)**
+Adds `width` and `height` attributes to image nodes, if they are missing (and the image referenced in the image nodes' `src` attribute is a local image file). **NEW**    
+
 **[autoAlt](https://github.com/mmikkel/Retcon-Craft/wiki/AutoAlt)**
 Adds Asset title or filename as alternative text for images missing `alt` tags
 
@@ -185,10 +190,10 @@ Removes all elements matching the given selector(s)
 Removes all empty elements. **NEW**
 
 **[only](https://github.com/mmikkel/Retcon-Craft/wiki/Only)**
-Removes everything but the elements matching the given selector(s)  
+Removes everything except the elements matching the given selector(s)  
 
 **[change](https://github.com/mmikkel/Retcon-Craft/wiki/Change)**
-Changes tag type for all elements matching the given selector(s)
+Changes tag type for all elements matching the given selector(s). Can also be used to remove tags completely, but retaining their content.  
 
 **[inject](https://github.com/mmikkel/Retcon-Craft/wiki/Inject)**
 Inject strings or HTML
