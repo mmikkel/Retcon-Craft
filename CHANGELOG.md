@@ -1,6 +1,8 @@
 # Retcon Changelog
 
 ## Unreleased
+### Added
+- Added a new `$allowFilenameAsAltText` parameter to the `retconAutoAlt` filter (default `true`; will be default `false` in Retcon 3.0)  
 ### Improved
 - Improved support for CKEditor.
 ### Changed
@@ -10,6 +12,7 @@
 - Fixed an issue where DOMDocument could wrap text nodes in `<p>` tags.
 - Fixed an issue where the `retconUnwrap` filter could unwrap root nodes.
 - Fixed an issue where the `autoAlt` filter was unable to retrieve alt value from the source asset.
+- Fixed an issue where the `retconAutoAlt` filter could use base64 `src` placeholders could be used for the alt value
 
 ## 2.6.1 - 2023-02-17
 ### Fixed
