@@ -9,9 +9,10 @@
 namespace mmikkel\retcon\helpers;
 
 use aelvan\imager\Imager;
+use aelvan\imager\models\Settings as ImagerSettings;
 
-use craft\elements\Asset;
 use mmikkel\retcon\models\RetconTransformedImage;
+
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
@@ -19,6 +20,7 @@ use mmikkel\retcon\Retcon;
 
 use Craft;
 use craft\base\PluginInterface;
+use craft\elements\Asset;
 use craft\helpers\App;
 use craft\helpers\FileHelper;
 use craft\helpers\Html;
@@ -30,6 +32,8 @@ use craft\helpers\UrlHelper;
 
 use craft\redactor\FieldData as RedactorFieldData;
 use craft\htmlfield\HtmlFieldData;
+
+use spacecatninja\imagerx\models\Settings as ImagerXSettings;
 
 use Twig\Markup;
 
@@ -146,6 +150,15 @@ class RetconHelper
         // If we can use Imager, we need to do minimal work
         $imagerPlugin = static::getImagerPlugin();
         if ($imagerPlugin) {
+            /** @var ImagerXSettings|ImagerSettings $imagerSettings */
+            $imagerSettings = $imagerPlugin->getSettings();
+            $safeFileFormats = array_map(static function (string $extension) {
+                return strtolower($extension);
+            }, $imagerSettings->safeFileFormats ?? ['jpg', 'jpeg', 'gif', 'png']);
+            $extension = strtolower(pathinfo($imageUrl, PATHINFO_EXTENSION));
+            if (!in_array($extension, $safeFileFormats)) {
+                return null;
+            }
             /** @var Imager|ImagerX $imagerPlugin */
             $transformedImage = $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults ?? [], $imagerConfigOverrides ?? []);
             if (is_array($transformedImage)) {

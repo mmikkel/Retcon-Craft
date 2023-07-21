@@ -8,6 +8,7 @@
 - Improved support for CKEditor.
 ### Changed
 - The `autoAlt` filter now uses the native `alt` attribute if it has a value (Craft 4 only).
+- When using Imager (X) to transform images, the `retconTransform` and `retconSrcset` filters now respect Imager's [`safeFileFormats`](https://imager-x.spacecat.ninja/configuration.html#safefileformats-array) configuration setting, i.e. these filters will only attempt to transform jpgs, gifs and pngs out of the box, unless additional formats have been added in Imager's config file.    
 ### Fixed
 - Fixed an issue where the `retconRemoveEmpty` filter would remove self-closing tags.  
 - Fixed an issue where DOMDocument could wrap text nodes in `<p>` tags.
