@@ -11,7 +11,6 @@ namespace mmikkel\retcon\library;
 use Craft;
 use craft\errors\SiteNotFoundException;
 use craft\helpers\Template;
-use craft\redactor\FieldData;
 
 use Masterminds\HTML5;
 
@@ -45,9 +44,7 @@ class RetconDom
      */
     public function __construct($html)
     {
-        if ($html instanceof FieldData && $rawContent = $html->getRawContent()) {
-            $html = $rawContent;
-        }
+        $html = (string)$html;
         $libxmlUseInternalErrors = \libxml_use_internal_errors(true);
         $content = \mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset());
         $this->doc = new \DOMDocument();
