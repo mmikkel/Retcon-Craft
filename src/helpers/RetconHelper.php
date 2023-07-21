@@ -423,7 +423,11 @@ class RetconHelper
         if (count($refSegments) < 2 || $refSegments[0] !== 'asset' || !($id = (int)$refSegments[1] ?? null)) {
             return null;
         }
-        return Asset::find()->id($id)->one();
+        $asset = Asset::find()->id($id)->one();
+        if (!$asset instanceof Asset) {
+            return null;
+        }
+        return $asset;
     }
 
     /**
@@ -437,7 +441,11 @@ class RetconHelper
             return null;
         }
         $pluginsService = Craft::$app->getPlugins();
-        return $pluginsService->getPlugin('imager') ?? $pluginsService->getPlugin('imager-x');
+        $imagerPlugin = $pluginsService->getPlugin('imager-x') ?? $pluginsService->getPlugin('imager');
+        if (!$imagerPlugin instanceof ImagerX && !$imagerPlugin instanceof Imager) {
+            return null;
+        }
+        return $imagerPlugin;
     }
 
     /**
