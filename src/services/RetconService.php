@@ -689,6 +689,11 @@ class RetconService extends Component
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
             $parentNode = $node->parentNode;
+
+            if (!$parentNode || $parentNode->nodeName === 'retcon') {
+                continue;
+            }
+
             $fragment = $doc->createDocumentFragment();
 
             while ($parentNode->childNodes->length > 0) {

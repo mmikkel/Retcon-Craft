@@ -4,6 +4,7 @@
 ### Fixed
 - Fixed an issue where the `retconRemoveEmpty` filter would remove self-closing tags.  
 - Fixed an issue where DOMDocument could wrap text nodes in `<p>` tags.
+- Fixed an issue where the `retconUnwrap` filter could unwrap root nodes
 
 ## 2.6.1 - 2023-02-17
 ### Fixed
