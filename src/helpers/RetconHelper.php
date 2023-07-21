@@ -262,13 +262,14 @@ class RetconHelper
         if (!\file_exists($imageTransformedPath)) {
 
             $image = Craft::$app->getImages()->loadImage($imagePath);
+            $upscaleImages = Craft::$app->getConfig()->getGeneral()->upscaleImages;
 
             switch ($transformMode) {
                 case 'crop':
-                    $image->scaleAndCrop($transform->width, $transform->height, true, $transform->position);
+                    $image->scaleAndCrop($transform->width, $transform->height, $upscaleImages, $transform->position);
                     break;
                 case 'fit':
-                    $image->scaleToFit($transform->width, $transform->height, true);
+                    $image->scaleToFit($transform->width, $transform->height, $upscaleImages);
                     break;
                 default:
                     $image->resize($transform->width, $transform->height);

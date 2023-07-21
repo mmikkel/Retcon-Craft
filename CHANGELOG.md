@@ -15,8 +15,9 @@
 - Fixed an issue where DOMDocument could wrap text nodes in `<p>` tags.
 - Fixed an issue where the `retconUnwrap` filter could unwrap root nodes.
 - Fixed an issue where the `autoAlt` filter was unable to retrieve alt value from the source asset.
-- Fixed an issue where the `retconAutoAlt` filter could use base64 `src` placeholders could be used for the alt value
-- Fixed a PHP exception that would occur if using `retconTransform` or `retconSrcset` with Imager X named transforms, if the named transform consisted of multiple transforms. Retcon will now use the first transform whenever Imager returns multiple transforms.  
+- Fixed an issue where the `retconAutoAlt` filter could use base64 `src` placeholders could be used for the alt value. 
+- Fixed a PHP exception that would occur if using `retconTransform` or `retconSrcset` with Imager X named transforms, if the named transform consisted of multiple transforms. Retcon will now use the first transform whenever Imager returns multiple transforms.
+- Fixed an issue where the `retconTransform` and `retconSrcset` filters could upscale images even if Craft's `upscaleImages` setting was set to `false`. 
 
 ## 2.6.1 - 2023-02-17
 ### Fixed
