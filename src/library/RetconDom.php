@@ -115,7 +115,7 @@ class RetconDom
     {
         // Unwrap the <retcon> wrapper node
         $rootNode = $this->doc->documentElement->firstChild;
-        if ($rootNode) {
+        if ($rootNode && $rootNode->parentNode) {
             $fragment = $this->doc->createDocumentFragment();
             while ($rootNode->childNodes->length > 0) {
                 $fragment->appendChild($rootNode->childNodes->item(0));
