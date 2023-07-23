@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.7.0.1 - 2023-07-23
+### Fixed 
+- Fixed a regression introduced in 2.7.0, that could remove text content from nodes returned by the `retconOnly` filter  
+
 ## 2.7.0 - 2023-07-22
 ### Added
 - Added a new `retconDimensions` filter, which can be used to set missing `width` and `height` attributes for image nodes.  
