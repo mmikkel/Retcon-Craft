@@ -114,7 +114,7 @@ class RetconDom
     public function getHtml()
     {
         // Unwrap the <retcon> wrapper node
-        $rootNode = $this->doc->documentElement->firstChild;
+        $rootNode = $this->doc->documentElement->firstChild ?? null;
         if ($rootNode && $rootNode->nodeName === 'retcon' && $rootNode->parentNode) {
             $fragment = $this->doc->createDocumentFragment();
             while ($rootNode->childNodes->length > 0) {
