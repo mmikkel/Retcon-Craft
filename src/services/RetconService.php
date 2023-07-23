@@ -804,8 +804,26 @@ class RetconService extends Component
         /** @var Crawler $crawler */
         $crawler = $nodes ?? $dom->getCrawler();
 
-        // Exclude self-closing tags from being removed
-        $excludedTags = ['area', 'base', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+        // Exclude self-closing tags (and some other tags that typically doesn't have *content*) from being removed
+        $excludedTags = [
+            'area',
+            'base',
+            'col',
+            'embed',
+            'hr',
+            'img',
+            'input',
+            'keygen',
+            'link',
+            'meta',
+            'param',
+            'source',
+            'track',
+            'wbr',
+            'svg',
+            'iframe',
+            'object',
+        ];
 
         // Retain linebreaks too?
         if (!$removeBr) {
@@ -818,7 +836,8 @@ class RetconService extends Component
             if (
                 ($node = $crawler->getNode(0)) === null ||
                 !$node->parentNode instanceof \DOMNode ||
-                $crawler->filterXPath($excludedTagsQuery)->getNode(0)
+                $crawler->filterXPath($excludedTagsQuery)->getNode(0) ||
+                @$crawler->closest('svg')
             ) {
                 return;
             }

@@ -1,10 +1,11 @@
 # Retcon Changelog
 
-## Unreleased 
+## 2.7.1 - 2023-07-23 
 
 ### Fixed
 
 - Fixed a PHP exception that could occur if Retcon operated on markup containing `<svg>` nodes  
+- Fixed an issue where the `retconRemoveEmpty` filter could remove `<svg>`, `<iframe>` and `<object>` tags
 
 ## 2.7.0.1 - 2023-07-23
 
