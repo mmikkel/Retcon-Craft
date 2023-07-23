@@ -5,7 +5,13 @@
 ### Fixed
 
 - Fixed a PHP exception that could occur if Retcon operated on markup containing `<svg>` nodes  
-- Fixed an issue where the `retconRemoveEmpty` filter could remove `<svg>`, `<iframe>` and `<object>` tags
+- Fixed an issue where the `retconRemoveEmpty` filter could remove `<svg>`, `<iframe>` and `<object>` tags 
+
+### Changed
+
+- Retcon now requires `symfony/dom-crawler` v. 4.4.0 or later  
+- Retcon now requires `symfony/css-selector` v. 3.4.0 or later  
+- Retcon now requires `masterminds/html5` v. 2.6.0 or later  
 
 ## 2.7.0.1 - 2023-07-23
 
