@@ -1,6 +1,6 @@
 # Retcon Changelog
 
-## Unreleased
+## 2.7.2 - 2023-07-30
 
 ### Fixed
 
