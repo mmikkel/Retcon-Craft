@@ -147,17 +147,18 @@ class RetconHelper
         // If we can use Imager, we need to do minimal work
         $imagerPlugin = static::getImagerPlugin();
         if ($imagerPlugin) {
-            $safeFileFormats =  $imagerPlugin->imager::getConfig()->safeFileFormats;
-            if (!is_array($safeFileFormats) || empty($safeFileFormats)) {
-                $safeFileFormats = null;
-            }
-            $safeFileFormats = $safeFileFormats ?? ['jpg', 'jpeg', 'gif', 'png'];
-            $safeFileFormats = array_map(static function (string $extension) {
-                return strtolower($extension);
-            }, $safeFileFormats);
-            $extension = strtolower(/** @scrutinizer ignore-type */ pathinfo($imageUrl, PATHINFO_EXTENSION));
-            if (!in_array($extension, $safeFileFormats)) {
-                return null;
+            if ($extension = strtok(strtolower(/** @scrutinizer ignore-type */ pathinfo($imageUrl, PATHINFO_EXTENSION)), '?')) {
+                $safeFileFormats =  $imagerPlugin->imager::getConfig()->safeFileFormats;
+                if (!is_array($safeFileFormats) || empty($safeFileFormats)) {
+                    $safeFileFormats = null;
+                }
+                $safeFileFormats = $safeFileFormats ?? ['jpg', 'jpeg', 'gif', 'png'];
+                $safeFileFormats = array_map(static function (string $extension) {
+                    return strtolower($extension);
+                }, $safeFileFormats);
+                if (!in_array($extension, $safeFileFormats)) {
+                    return null;
+                }
             }
             /** @var Imager|ImagerX $imagerPlugin */
             $transformedImage = $imagerPlugin->imager->transformImage($imageUrl, $transform, $imagerTransformDefaults ?? [], $imagerConfigOverrides ?? []);

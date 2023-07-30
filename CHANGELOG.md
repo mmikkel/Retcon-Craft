@@ -1,5 +1,11 @@
 # Retcon Changelog
 
+## Unreleased
+
+### Fixed
+
+- Fixed a regression introduced in Retcon 2.7.0, where Imager/Imager X would fail to transform external images, if the image URL contained a query string or was missing a file extension
+
 ## 2.7.1 - 2023-07-23 
 
 ### Fixed
