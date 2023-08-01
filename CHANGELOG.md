@@ -1,5 +1,11 @@
 # Retcon Changelog
 
+## 2.7.3 - 2023-08-01
+
+### Fixed  
+
+- Fixed a regression introduced in Retcon 2.7.0, where Retcon would return unparsed reference tags from Redactor/CKEditor output, in cases where there were no nodes matching the given selector.   
+
 ## 2.7.2 - 2023-07-30
 
 ### Fixed

@@ -44,16 +44,16 @@ class RetconService extends Component
 {
 
     /**
-     * @param $html
+     * @param $input
      * @param mixed ...$args
      * @return mixed|string|null
      * @throws Exception
      */
-    public function retcon($html, ...$args)
+    public function retcon($input, ...$args)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         if (empty($args)) {
@@ -75,14 +75,14 @@ class RetconService extends Component
 
         }
 
-        return $html;
+        return \Craft::$app->getElements()->parseRefs((string)$html);
 
     }
 
     /**
      * Applies an image transform to all images (or all nodes matching the passed selector(s))
      *
-     * @param $html
+     * @param $input
      * @param $transform
      * @param string|string[]|null $selector
      * @param array|null $imagerTransformDefaults
@@ -93,11 +93,17 @@ class RetconService extends Component
      * @throws ImageTransformException
      * @throws SiteNotFoundException
      */
-    public function transform($html, $transform, $selector = null, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
+    public function transform($input, $transform, $selector = null, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
+        }
+
+        $transform = RetconHelper::getImageTransform($transform);
+
+        if (!$transform) {
+            return $input;
         }
 
         if (empty($selector)) {
@@ -108,13 +114,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
-        }
-
-        $transform = RetconHelper::getImageTransform($transform);
-
-        if (!$transform) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         /** @var \DOMElement $node */
@@ -160,7 +160,7 @@ class RetconService extends Component
     /**
      * Creates a srcset attribute for all images (or all nodes matching the selector(s) passed) with the proper transforms
      *
-     * @param $html
+     * @param $input
      * @param $transforms
      * @param string|string[]|null $selector
      * @param string|string[]|null $sizes
@@ -171,11 +171,11 @@ class RetconService extends Component
      * @throws Exception
      * @throws SiteNotFoundException
      */
-    public function srcset($html, $transforms, $selector = null, $sizes = null, ?bool $base64src = null, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
+    public function srcset($input, $transforms, $selector = null, $sizes = null, ?bool $base64src = null, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         if (empty($selector)) {
@@ -194,7 +194,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         // Get transforms
@@ -211,7 +211,7 @@ class RetconService extends Component
         }, []);
 
         if (empty($transforms)) {
-            return $html;
+            return $input;
         }
 
         // Get sizes attribute
@@ -279,7 +279,7 @@ class RetconService extends Component
     /**
      * Prepares all images (or all nodes matching the selector(s) passed) by swapping out the `src` attribute with a base64 encoded, transparent SVG. The original source will be retained in a data attribute
      *
-     * @param $html
+     * @param $input
      * @param string|string[]|null $selector
      * @param string|null $className
      * @param string|null $attributeName
@@ -287,11 +287,11 @@ class RetconService extends Component
      * @throws Exception
      * @throws SiteNotFoundException
      */
-    public function lazy($html, $selector = null, ?string $className = null, ?string $attributeName = null)
+    public function lazy($input, $selector = null, ?string $className = null, ?string $attributeName = null)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         if (empty($selector)) {
@@ -310,7 +310,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         $attributeName = "data-{$attributeName}";
@@ -348,7 +348,7 @@ class RetconService extends Component
     /**
      * Attempts to auto-generate alternative text for all images (or all elements matching the $selector attribute).
      *
-     * @param $html
+     * @param $input
      * @param string|string[] $selector
      * @param string|null $field
      * @param bool $overwrite
@@ -356,18 +356,18 @@ class RetconService extends Component
      * @return Markup|string
      * @throws SiteNotFoundException
      */
-    public function autoAlt($html, $selector = 'img', string $field = null, bool $overwrite = false, bool $allowFilenameAsAltText = true)
+    public function autoAlt($input, $selector = 'img', string $field = null, bool $overwrite = false, bool $allowFilenameAsAltText = true)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         $isCraft4 = version_compare(\Craft::$app->getVersion(), '4.0.0', '>=');
@@ -405,29 +405,25 @@ class RetconService extends Component
     /**
      * Adds (to) or replaces one or many attributes for one or many selectors
      *
-     * @param $html
+     * @param $input
      * @param string|string[] $selector
      * @param array $attributes
      * @param string|bool $overwrite (true, false, "prepend" or "append")
-     * @return string|Markup|null
+     * @return Markup
      * @throws SiteNotFoundException
      */
-    public function attr($html, $selector, array $attributes, $overwrite = true)
+    public function attr($input, $selector, array $attributes, $overwrite = true)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
-        }
-
-        if (empty($attributes)) {
-            return TemplateHelper::raw($html);
+        if (empty($attributes) || !$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         if ($overwrite === false) {
@@ -467,24 +463,24 @@ class RetconService extends Component
     /**
      * Renames attributes for matching selector(s)
      *
-     * @param $html
+     * @param $input
      * @param string|string[] $selector
      * @param array $attributes
      * @return string|Markup|null
      * @throws SiteNotFoundException
      */
-    public function renameAttr($html, $selector, array $attributes)
+    public function renameAttr($input, $selector, array $attributes)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         /** @var \DOMElement $node */
@@ -506,23 +502,23 @@ class RetconService extends Component
     /**
      * Remove all elements matching given selector(s)
      *
-     * @param $html
+     * @param $input
      * @param string|string[] $selector
      * @return string|Markup|null
      * @throws SiteNotFoundException
      */
-    public function remove($html, $selector)
+    public function remove($input, $selector)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         /** @var \DOMElement $node */
@@ -537,23 +533,23 @@ class RetconService extends Component
     /**
      * Remove everything except nodes matching given selector(s)
      *
-     * @param $html
+     * @param $input
      * @param string|string[] $selector
      * @return string|Markup|null
      * @throws SiteNotFoundException
      */
-    public function only($html, $selector)
+    public function only($input, $selector)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw('');
+            return '';
         }
 
         $doc = $dom->getDoc();
@@ -575,24 +571,24 @@ class RetconService extends Component
     /**
      * Changes tag type/name for given selector(s). Can also remove tags (whilst retaining their contents) by passing `false` for the $toTag parameter
      *
-     * @param $html
+     * @param $input
      * @param string|string[] $selector
      * @param string $toTag
      * @return string|Markup|null
      * @throws SiteNotFoundException
      */
-    public function change($html, $selector, string $toTag)
+    public function change($input, $selector, string $toTag)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         $doc = $dom->getDoc();
@@ -629,25 +625,25 @@ class RetconService extends Component
     /**
      * Wraps all nodes matching the given selector(s) in a container
      *
-     * @param $html
+     * @param $input
      * @param string|string[] $selector
      * @param string $container
      * @return string|Markup|null
      * @throws \DOMException
      * @throws SiteNotFoundException
      */
-    public function wrap($html, $selector, string $container)
+    public function wrap($input, $selector, string $container)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         $doc = $dom->getDoc();
@@ -675,23 +671,23 @@ class RetconService extends Component
     /**
      * Removes the parent of all nodes matching given selector(s), retaining all child nodes
      *
-     * @param $html
+     * @param $input
      * @param string|string[] $selector
      * @return string|Markup|null
      * @throws SiteNotFoundException
      */
-    public function unwrap($html, $selector)
+    public function unwrap($input, $selector)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         $doc = $dom->getDoc();
@@ -720,25 +716,25 @@ class RetconService extends Component
     /**
      * Injects string value (could be HTML!) into all nodes matching given selector(s)
      *
-     * @param $html
+     * @param $input
      * @param string|string[] $selector
      * @param string $toInject
      * @param bool $overwrite
      * @return string|Markup|null
      * @throws SiteNotFoundException
      */
-    public function inject($html, $selector, string $toInject, bool $overwrite = false)
+    public function inject($input, $selector, string $toInject, bool $overwrite = false)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         $dom = new RetconDom($html);
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         $doc = $dom->getDoc();
@@ -778,17 +774,17 @@ class RetconService extends Component
     /**
      * Removes empty nodes matching given selector(s), or all empty nodes if no selector
      *
-     * @param $html
+     * @param $input
      * @param string|string[]|null $selector
      * @param bool $removeBr
      * @return string|Markup|null
      * @throws SiteNotFoundException
      */
-    public function removeEmpty($html, $selector = null, bool $removeBr = false)
+    public function removeEmpty($input, $selector = null, bool $removeBr = false)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         $dom = new RetconDom($html);
@@ -797,7 +793,7 @@ class RetconService extends Component
         if ($selector) {
             $nodes = $dom->filter($selector, false);
             if (empty($nodes)) {
-                return TemplateHelper::raw($html);
+                return $input;
             }
         }
 
@@ -850,16 +846,16 @@ class RetconService extends Component
     /**
      * Sets width and height attributes for image nodes, if they are missing
      *
-     * @param $html
+     * @param $input
      * @param string|string[]|null $selector
      * @return string|Markup|null
      * @throws Exception
      */
-    public function dimensions($html, $selector = null)
+    public function dimensions($input, $selector = null)
     {
 
-        if (!$html = RetconHelper::getHtmlFromParam($html)) {
-            return $html;
+        if (!$html = RetconHelper::getHtmlFromParam($input)) {
+            return $input;
         }
 
         if (empty($selector)) {
@@ -870,7 +866,7 @@ class RetconService extends Component
         $nodes = $dom->filter($selector);
 
         if (empty($nodes)) {
-            return TemplateHelper::raw($html);
+            return $input;
         }
 
         /** @var \DOMElement $node */

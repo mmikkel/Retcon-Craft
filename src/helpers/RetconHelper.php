@@ -51,6 +51,9 @@ class RetconHelper
      */
     public static function getHtmlFromParam($value): ?string
     {
+        if (empty($value)) {
+            return null;
+        }
         if ($value instanceof RedactorFieldData || $value instanceof HtmlFieldData) {
             $html = $value->getRawContent();
         } else {
