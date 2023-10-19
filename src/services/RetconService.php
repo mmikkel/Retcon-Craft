@@ -268,7 +268,7 @@ class RetconService extends Component
             }
 
             if ($base64src) {
-                $node->setAttribute('src', RetconHelper::getBase64Pixel($width ?? 1, $height ?? 11));
+                $node->setAttribute('src', RetconHelper::getBase64Pixel($width ?? 1, $height ?? 1));
             }
         }
 

@@ -1,5 +1,11 @@
 # Retcon Changelog
 
+## Unreleased
+
+### Fixed  
+
+- Fixed an issue where the `retconSrcset` filter could use the wrong height value for the base64 placeholder `src` attribute  
+
 ## 2.7.3 - 2023-08-01
 
 ### Fixed  
