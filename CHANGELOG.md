@@ -1,39 +1,45 @@
 # Retcon Changelog
 
-## Unreleased
-### Fixed 
-- Fixed a PHP exception that could be thrown when using the `retconTransform` or `retconSrcset` with Imager (not Imager X) installed  
+## 2.7.5 - 2023-11-11
+
+### Fixed
+
+- Fixed a PHP exception that could be thrown when using the `retconTransform` or `retconSrcset` with Imager (not Imager
+  X) installed
 
 ## 2.7.4 - 2023-10-19
 
-### Fixed  
+### Fixed
 
-- Fixed an issue where the `retconSrcset` filter could use the wrong height value for the base64 placeholder `src` attribute  
+- Fixed an issue where the `retconSrcset` filter could use the wrong height value for the base64 placeholder `src`
+  attribute
 
 ## 2.7.3 - 2023-08-01
 
-### Fixed  
+### Fixed
 
-- Fixed a regression introduced in Retcon 2.7.0, where Retcon would return unparsed reference tags from Redactor/CKEditor output, in cases where there were no nodes matching the given selector.   
+- Fixed a regression introduced in Retcon 2.7.0, where Retcon would return unparsed reference tags from
+  Redactor/CKEditor output, in cases where there were no nodes matching the given selector.
 
 ## 2.7.2 - 2023-07-30
 
 ### Fixed
 
-- Fixed a regression introduced in Retcon 2.7.0, where Imager/Imager X would fail to transform external images, if the image URL contained a query string or was missing a file extension
+- Fixed a regression introduced in Retcon 2.7.0, where Imager/Imager X would fail to transform external images, if the
+  image URL contained a query string or was missing a file extension
 
-## 2.7.1 - 2023-07-23 
+## 2.7.1 - 2023-07-23
 
 ### Fixed
 
-- Fixed a PHP exception that could occur if Retcon operated on markup containing `<svg>` nodes  
-- Fixed an issue where the `retconRemoveEmpty` filter could remove `<svg>`, `<iframe>` and `<object>` tags 
+- Fixed a PHP exception that could occur if Retcon operated on markup containing `<svg>` nodes
+- Fixed an issue where the `retconRemoveEmpty` filter could remove `<svg>`, `<iframe>` and `<object>` tags
 
 ### Changed
 
-- Retcon now requires `symfony/dom-crawler` v. 4.4.0 or later  
-- Retcon now requires `symfony/css-selector` v. 3.4.0 or later  
-- Retcon now requires `masterminds/html5` v. 2.6.0 or later  
+- Retcon now requires `symfony/dom-crawler` v. 4.4.0 or later
+- Retcon now requires `symfony/css-selector` v. 3.4.0 or later
+- Retcon now requires `masterminds/html5` v. 2.6.0 or later
 
 ## 2.7.0.1 - 2023-07-23
 
