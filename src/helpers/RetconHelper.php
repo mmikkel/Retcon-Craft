@@ -151,7 +151,7 @@ class RetconHelper
         $imagerPlugin = static::getImagerPlugin();
         if ($imagerPlugin) {
             if ($extension = strtok(strtolower(/** @scrutinizer ignore-type */ pathinfo($imageUrl, PATHINFO_EXTENSION)), '?')) {
-                $safeFileFormats =  $imagerPlugin->imager::getConfig()->safeFileFormats;
+                $safeFileFormats =  $imagerPlugin->imager::getConfig()->safeFileFormats ?? null;
                 if (!is_array($safeFileFormats) || empty($safeFileFormats)) {
                     $safeFileFormats = null;
                 }

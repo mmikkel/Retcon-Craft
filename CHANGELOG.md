@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## Unreleased
+### Fixed 
+- Fixed a PHP exception that could be thrown when using the `retconTransform` or `retconSrcset` with Imager (not Imager X) installed  
+
 ## 2.7.4 - 2023-10-19
 
 ### Fixed  
