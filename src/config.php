@@ -1,11 +1,11 @@
 <?php
 /**
- * Retcon plugin for Craft CMS 3.x
+ * Retcon plugin for Craft CMS 5.x
  *
  * A collection of powerful Twig filters for modifying HTML
  *
  * @link      https://vaersaagod.no
- * @copyright Copyright (c) 2017 Mats Mikkel Rummelhoff
+ * @copyright Copyright (c) 2024 Mats Mikkel Rummelhoff
  */
 
 /**

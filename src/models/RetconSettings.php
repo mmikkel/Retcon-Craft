@@ -4,9 +4,13 @@ namespace mmikkel\retcon\models;
 
 use Craft;
 use craft\base\Model;
-use craft\helpers\StringHelper;
-use mmikkel\retcon\helpers\RetconHelper;
+use craft\helpers\App;
 
+/**
+ * @author    Mats Mikkel Rummelhoff
+ * @package   Retcon
+ * @since     1.0.0
+ */
 class RetconSettings extends Model
 {
 
@@ -46,12 +50,12 @@ class RetconSettings extends Model
     public function init(): void
     {
         parent::init();
-        $baseTransformPath = RetconHelper::parseEnv($this->baseTransformPath);
-        if ($baseTransformPath && \is_string($baseTransformPath)) {
+        $baseTransformPath = App::parseEnv($this->baseTransformPath);
+        if ($baseTransformPath && is_string($baseTransformPath)) {
             $this->baseTransformPath = $baseTransformPath;
         }
-        $baseTransformUrl = RetconHelper::parseEnv($this->baseTransformUrl);
-        if ($baseTransformUrl && \is_string($baseTransformUrl)) {
+        $baseTransformUrl = App::parseEnv($this->baseTransformUrl);
+        if ($baseTransformUrl && is_string($baseTransformUrl)) {
             $this->baseTransformUrl = $baseTransformUrl;
         }
     }

@@ -1,26 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mmikkel
- * Date: 06/12/2017
- * Time: 18:24
- */
 
 namespace mmikkel\retcon\helpers;
 
 use aelvan\imager\Imager;
 
-use mmikkel\retcon\models\RetconTransformedImage;
-
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
+use mmikkel\retcon\models\RetconTransformedImage;
 use mmikkel\retcon\Retcon;
 
 use Craft;
 use craft\base\PluginInterface;
 use craft\elements\Asset;
-use craft\helpers\App;
 use craft\helpers\FileHelper;
 use craft\helpers\Html;
 use craft\helpers\Image as ImageHelper;
@@ -28,8 +20,6 @@ use craft\helpers\ImageTransforms;
 use craft\helpers\StringHelper;
 use craft\helpers\Template as TemplateHelper;
 use craft\helpers\UrlHelper;
-
-use craft\redactor\FieldData as RedactorFieldData;
 use craft\htmlfield\HtmlFieldData;
 
 use Twig\Markup;
@@ -37,6 +27,11 @@ use Twig\Markup;
 use yii\base\Exception;
 use yii\helpers\Json;
 
+/**
+ * @author    Mats Mikkel Rummelhoff
+ * @package   Retcon
+ * @since     1.0.0
+ */
 class RetconHelper
 {
 
@@ -54,7 +49,7 @@ class RetconHelper
         if (empty($value)) {
             return null;
         }
-        if ($value instanceof RedactorFieldData || $value instanceof HtmlFieldData) {
+        if ($value instanceof HtmlFieldData) {
             $html = $value->getRawContent();
         } else {
             $html = (string)$value;
@@ -179,7 +174,7 @@ class RetconHelper
         }
 
         /** @var RetconSettings $settings */
-        $settings = Retcon::$plugin->getSettings();
+        $settings = Retcon::getInstance()->getSettings();
 
         if (!$settings->baseTransformPath || !\is_string($settings->baseTransformPath)) {
             throw new Exception('No base transform URL found in settings. Please add a valid path to the `baseTransformPath` setting in /config/retcon.php');
@@ -340,7 +335,7 @@ class RetconHelper
         }
 
         /** @var RetconSettings $settings */
-        $settings = Retcon::$plugin->getSettings();
+        $settings = Retcon::getInstance()->getSettings();
         $basePath = $settings->baseTransformPath;
         $siteUrl = UrlHelper::siteUrl();
         $host = \parse_url($siteUrl, PHP_URL_HOST);
@@ -427,7 +422,7 @@ class RetconHelper
      * @param string $str
      * @return null|string|string[]
      */
-    public static function fixSlashes(string $str)
+    public static function fixSlashes(string $str): array|string|null
     {
         return preg_replace('~(^|[^:])//+~', '\\1/', $str);
     }
@@ -465,10 +460,10 @@ class RetconHelper
     /**
      * @return Imager|ImagerX|null
      */
-    public static function getImagerPlugin()
+    public static function getImagerPlugin(): Imager|ImagerX|null
     {
         /** @var RetconSettings $settings */
-        $settings = Retcon::$plugin->getSettings();
+        $settings = Retcon::getInstance()->getSettings();
         if (!$settings->useImager) {
             return null;
         }
@@ -482,10 +477,10 @@ class RetconHelper
 
     /**
      * @param string $key
-     * @param string|bool|array|null $attributes
+     * @param mixed $attributes
      * @return array
      */
-    public static function getNormalizedDomNodeAttributeValues(string $key, $attributes = null): array
+    public static function getNormalizedDomNodeAttributeValues(string $key, mixed $attributes = null): array
     {
 
         if ($attributes instanceof Markup) {
@@ -544,18 +539,6 @@ class RetconHelper
         }
 
         return $return;
-    }
-
-    /**
-     * @param string|null $value
-     * @return bool|string|null
-     */
-    public static function parseEnv(?string $value)
-    {
-        if (\version_compare(Craft::$app->getVersion(), '3.7.29', '<')) {
-            return Craft::parseEnv($value);
-        }
-        return App::parseEnv($value);
     }
 
 }

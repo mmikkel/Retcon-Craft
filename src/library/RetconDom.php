@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mmikkel
- * Date: 06/12/2017
- * Time: 18:23
- */
 
 namespace mmikkel\retcon\library;
 
@@ -18,6 +12,11 @@ use Symfony\Component\DomCrawler\Crawler;
 
 use Twig\Markup;
 
+/**
+ * @author    Mats Mikkel Rummelhoff
+ * @package   Retcon
+ * @since     1.0.0
+ */
 class RetconDom
 {
 

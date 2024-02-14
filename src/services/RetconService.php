@@ -1,12 +1,4 @@
 <?php
-/**
- * Retcon plugin for Craft CMS 3.x
- *
- * A collection of powerful Twig filters for modifying HTML
- *
- * @link      https://vaersaagod.no
- * @copyright Copyright (c) 2017 Mats Mikkel Rummelhoff
- */
 
 namespace mmikkel\retcon\services;
 
@@ -16,7 +8,6 @@ use craft\errors\ImageTransformException;
 use craft\errors\SiteNotFoundException;
 use craft\helpers\ArrayHelper;
 use craft\helpers\StringHelper;
-use craft\helpers\Template as TemplateHelper;
 
 use mmikkel\retcon\helpers\RetconHelper;
 use mmikkel\retcon\library\RetconDom;
@@ -28,14 +19,6 @@ use Twig\Markup;
 use yii\base\Exception;
 
 /**
- * Retcon Service
- *
- * All of your plugin’s business logic should go in services, including saving data,
- * retrieving data, etc. They provide APIs that your controllers, template variables,
- * and other plugins can interact with.
- *
- * https://craftcms.com/docs/plugins/services
- *
  * @author    Mats Mikkel Rummelhoff
  * @package   Retcon
  * @since     1.0.0

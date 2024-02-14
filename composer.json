@@ -2,7 +2,7 @@
     "name": "mmikkel/retcon",
     "description": "Powerful Twig filters for mutating and querying HTML",
     "type": "craft-plugin",
-    "version": "2.7.5",
+    "version": "3.0.0-beta.1",
     "keywords": [
         "craft",
         "cms",
@@ -22,11 +22,11 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.7.0|^4.0.0-beta.4",
-        "php": "^7.2.5|^8.0",
+        "php": "^8.2",
+        "craftcms/cms": "^5.0.0-beta.1",
         "masterminds/html5": "^2.6",
-        "symfony/dom-crawler": "^4.4|^5.0|^6.0",
-        "symfony/css-selector": "^3.4|^4.0|^5.0|^6.0"
+        "symfony/dom-crawler": "^6.0|^7.0",
+        "symfony/css-selector": "^6.0|^7.0"
     },
     "require-dev": {
         "craftcms/rector": "dev-main"
