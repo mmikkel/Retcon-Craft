@@ -6,4 +6,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## 3.0.0 - 2024-03-28
 ### Added
-- Craft 5.0 compatibility
+- Added Craft 5.0 compatibility
+### Changed
+- Deprecated the `craft.retcon` variable

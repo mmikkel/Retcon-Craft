@@ -109,7 +109,7 @@ public function init() {
 
 A "selector" in Retcon is the same thing as a selector in CSS – i.e. something like `'img'`, `'.foo'` or `h3 + p`.
 
-In Retcon 2.x, _almost all CSS selectors_ will work – see the [CssSelector](https://symfony.com/doc/3.3/components/css_selector.html) docs for further details on selectors.
+In Retcon 2+, _almost all CSS selectors_ will work – see the [CssSelector](https://symfony.com/doc/3.3/components/css_selector.html) docs for further details on selectors.
 
 #### Multiple selectors
 
