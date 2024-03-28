@@ -17,25 +17,7 @@ Retcon is a tiny Craft CMS plugin adding a series of powerful Twig filters for m
 
 ## Requirements
 
-This plugin requires Craft CMS 3.7.0 or 4.0.0-beta.4.  
-
-## Installation
-
-To install the plugin, follow these instructions.
-
-1. Open your terminal and go to your Craft project:
-
-`cd /path/to/project`
-
-2. Add Retcon as a dependency to your project using Composer:
-
-`composer require mmikkel/retcon`
-
-3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Retcon, or use the `craft` executable:
-
-`./craft plugin/install retcon`
-
-Alternatively, Retcon can be installed from the Craft CMS Plugin Store inside the Craft Control Panel.
+This plugin requires Craft CMS 5.0+  
 
 ## How does it work?
 
