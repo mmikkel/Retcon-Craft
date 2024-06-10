@@ -2,7 +2,7 @@
 
 Retcon is a tiny Craft CMS plugin adding a series of powerful Twig filters for modifying HTML content. **Here are some of the things Retcon can do:**
 
-* Add attributes (e.g. `class="foobar"`, `style="color:red;"` or `data-foo`) using CSS selectors (e.g. `'img'`, `'div.foobar'`, `'p:first-child'` etc)  
+* Add attributes (e.g. `class="foobar"`, `style="color:red;"` or `data-foo`) using [CSS selectors](#selectors) (e.g. `'img'`, `'div.foobar'`, `'p:first-child'` etc)  
 * Append values to existing attributes
 * Remove attributes completely (e.g. removing all inline `style` attributes)
 * Transform inline images (it even uses [Imager](https://github.com/aelvan/Imager-Craft), if installed)
@@ -107,13 +107,40 @@ public function init() {
 
 ### Selectors
 
-A "selector" in Retcon is the same thing as a selector in CSS – i.e. something like `'img'`, `'.foo'` or `h3 + p`.
+A "selector" in Retcon is the same thing as a selector in CSS; i.e. something like `'img'`, `'.foo'` or `h3 + p`.
 
-In Retcon 2+, _almost all CSS selectors_ will work – see the [CssSelector](https://symfony.com/doc/3.3/components/css_selector.html) docs for further details on selectors.
+_Retcon's selector support is close to full parity with CSS_, but not every selector will work. See the [CssSelector](https://symfony.com/doc/7.0/components/css_selector.html#limitations-of-the-cssselector-component) docs for further details.
 
 #### Multiple selectors
 
 Multiple selectors can be defined as a comma-separated string (i.e. `'p, span'`) or as an array (i.e. `['p', 'span']`).
+
+#### Selecting top level nodes only
+
+*New (Retcon 3.1.0+ only)*:  
+
+If you need to limit your selection to top-level nodes only, the `'body'` element selector can be used in conjunction with the child combinator (`'>'`). As an example:    
+
+```twig
+{# Make all top level <p> tags red #}
+{% apply retconAttr('body > p', { style: 'color: red;' }) %} 
+    <p>I wanna be red</p>
+    <div>
+        <p>I wanna be left alone</p>
+    </div>
+{% endapply %}
+```
+
+Result:  
+
+```html
+<p style="color: red;">I wanna be red</p>
+<div>
+    <p>I wanna be left alone</p>
+</div>
+```
+
+_The body element selector is supported for all filters._  
 
 ### Methods
 

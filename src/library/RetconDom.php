@@ -62,9 +62,23 @@ class RetconDom
      */
     public function filter($selector, bool $asArray = true)
     {
-        if (\is_array($selector)) {
-            $selector = \implode(',', $selector);
+        if (!is_array($selector)) {
+            $selector = explode(',', $selector);
         }
+        $selector = array_reduce($selector, static function (array $carry, string $selector) {
+            $selector = trim($selector);
+            if (empty($selector)) {
+                return $carry;
+            }
+            if (str_starts_with($selector, 'body')) {
+                $selector = substr_replace($selector, 'html > retcon', 0, 4);
+            }
+            return [
+                ...$carry,
+                $selector
+            ];
+        }, []);
+        $selector = implode(',', $selector);
         $nodes = $this->crawler->filter($selector);
         if (!$asArray) {
             return $nodes;
