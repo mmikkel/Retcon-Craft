@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## 3.1.1 - 2024-06-14
 ### Fixed
-- Fixes a compatibility issue with CKEditor 4.1, where applying a Retcon filter to a CKEditor field's output would cause nested entries to not render 
+- Fixed a compatibility issue with CKEditor 4.1, where applying a Retcon filter to a CKEditor field's output would cause nested entries to not render 
 
 ## 3.1.0 - 2024-06-10
 ### Added  
