@@ -4,6 +4,7 @@ namespace mmikkel\retcon\helpers;
 
 use aelvan\imager\Imager;
 
+use craft\ckeditor\data\FieldData;
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
@@ -44,12 +45,14 @@ class RetconHelper
      * @param mixed $value
      * @return null|string
      */
-    public static function getHtmlFromParam($value): ?string
+    public static function getHtmlFromParam(mixed $value): ?string
     {
         if (empty($value)) {
             return null;
         }
-        if ($value instanceof HtmlFieldData) {
+        if ($value instanceof FieldData) {
+            $html = $value->__toString();
+        } elseif ($value instanceof HtmlFieldData) {
             $html = $value->getRawContent();
         } else {
             $html = (string)$value;
