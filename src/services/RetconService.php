@@ -125,8 +125,13 @@ class RetconService extends Component
                 continue;
             }
 
-            if (!$transformedImage = RetconHelper::getTransformedImage($src, $transform, $imagerTransformDefaults, $imagerConfigOverrides)) {
+            $transformedImage = RetconHelper::getTransformedImage($src, $transform, $imagerTransformDefaults, $imagerConfigOverrides);
+            if (empty($transformedImage)) {
                 continue;
+            }
+
+            if (is_array($transformedImage)) {
+                $transformedImage = $transformedImage[0];
             }
 
             $node->setAttribute('src', $transformedImage->url);
@@ -229,9 +234,14 @@ class RetconService extends Component
 
             // Get transformed images
             $transformedImages = \array_reduce($transforms, static function ($carry, $transform) use ($src, $imagerTransformDefaults, $imagerConfigOverrides) {
-                if ($transformedImage = RetconHelper::getTransformedImage($src, $transform, $imagerTransformDefaults, $imagerConfigOverrides)) {
-                    $carry[] = $transformedImage;
+                $transformedImage = RetconHelper::getTransformedImage($src, $transform, $imagerTransformDefaults, $imagerConfigOverrides);
+                if (empty($transformedImage)) {
+                    return $carry;
                 }
+                if (is_array($transformedImage)) {
+                    return array_merge($carry, $transformedImage);
+                }
+                $carry[] = $transformedImage;
                 return $carry;
             }, []);
 

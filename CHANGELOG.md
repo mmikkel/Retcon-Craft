@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.8.0 - 2024-06-28
+### Improved
+- Improves support for Imager X named transforms for the `retconSrcset` filter. [#69](https://github.com/mmikkel/Retcon-Craft/issues/69)
+
 ## 2.7.5 - 2023-11-11
 
 ### Fixed
