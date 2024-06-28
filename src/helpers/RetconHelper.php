@@ -133,12 +133,12 @@ class RetconHelper
      * @param $transform
      * @param array|null $imagerTransformDefaults
      * @param array|null $imagerConfigOverrides
-     * @return RetconTransformedImage|null
+     * @return RetconTransformedImage|RetconTransformedImage[]|null
      * @throws Exception
      * @throws \craft\errors\ImageException
      * @throws \spacecatninja\imagerx\exceptions\ImagerException
      */
-    public static function getTransformedImage(string $src, $transform, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null): ?RetconTransformedImage
+    public static function getTransformedImage(string $src, $transform, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null): RetconTransformedImage|array|null
     {
 
         // TODO: In Retcon 3.0, we should try to get the asset via RetconHelper::getAssetFromRef(), and transform that directly
@@ -167,7 +167,17 @@ class RetconHelper
                 return null;
             }
             if (is_array($transformedImage)) {
-                $transformedImage = $transformedImage[0] ?? null;
+                return array_reduce($transformedImage, static function (array $carry, $transformedImage) {
+                    if (empty($transformedImage)) {
+                        return $carry;
+                    }
+                    $carry[] = new RetconTransformedImage([
+                        'url' => $transformedImage->getUrl(),
+                        'width' => $transformedImage->getWidth(),
+                        'height' => $transformedImage->getHeight(),
+                    ]);
+                    return $carry;
+                }, []) ?: null;
             }
             return new RetconTransformedImage([
                 'url' => $transformedImage->getUrl(),
