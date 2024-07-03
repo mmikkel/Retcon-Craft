@@ -10,11 +10,10 @@ namespace mmikkel\retcon\helpers;
 
 use aelvan\imager\Imager;
 
-use mmikkel\retcon\models\RetconTransformedImage;
-
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
+use mmikkel\retcon\models\RetconTransformedImage;
 use mmikkel\retcon\Retcon;
 
 use Craft;
@@ -28,7 +27,6 @@ use craft\helpers\ImageTransforms;
 use craft\helpers\StringHelper;
 use craft\helpers\Template as TemplateHelper;
 use craft\helpers\UrlHelper;
-
 use craft\redactor\FieldData as RedactorFieldData;
 use craft\htmlfield\HtmlFieldData;
 
@@ -140,7 +138,7 @@ class RetconHelper
      * @throws \craft\errors\ImageException
      * @throws \spacecatninja\imagerx\exceptions\ImagerException
      */
-    public static function getTransformedImage(string $src, $transform, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null): RetconTransformedImage|array|null
+    public static function getTransformedImage(string $src, $transform, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null)
     {
 
         // TODO: In Retcon 3.0, we should try to get the asset via RetconHelper::getAssetFromRef(), and transform that directly

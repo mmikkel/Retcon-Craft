@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## 2.8.1 - 2024-07-03
+### Fixed
+- Fixed a PHP 7 compatibility issue introduced in Retcon 2.8.0, affecting Craft 3 installs using the `retconSrcset` or `retconTransform` filters. [#69](https://github.com/mmikkel/Retcon-Craft/issues/69)
+
 ## 2.8.0 - 2024-06-28
 ### Improved
 - Improves support for Imager X named transforms for the `retconSrcset` filter. [#69](https://github.com/mmikkel/Retcon-Craft/issues/69)
