@@ -4,7 +4,10 @@ namespace mmikkel\retcon\helpers;
 
 use aelvan\imager\Imager;
 
-use craft\ckeditor\data\FieldData;
+use craft\ckeditor\data\BaseChunk;
+use craft\ckeditor\data\FieldData as CkEditorFieldData;
+use craft\ckeditor\data\Markup as CkEditorMarkup;
+
 use spacecatninja\imagerx\ImagerX;
 
 use mmikkel\retcon\models\RetconSettings;
@@ -43,21 +46,31 @@ class RetconHelper
 
     /**
      * @param mixed $value
-     * @return null|string
+     * @param bool $preserveReferenceTags Whether to preserve reference tags in Redactor & CKEditor content or not
+     * @return string|null
      */
-    public static function getHtmlFromParam(mixed $value): ?string
+    public static function getHtmlFromParam(mixed $value, bool $preserveReferenceTags = false): ?string
     {
         if (empty($value)) {
             return null;
         }
-        if ($value instanceof FieldData) {
-            $html = $value->__toString();
-        } elseif ($value instanceof HtmlFieldData) {
-            $html = $value->getRawContent();
+        if ($preserveReferenceTags) {
+            if ($value instanceof CkEditorFieldData && class_exists(BaseChunk::class)) {
+                $html = $value->getChunks()->map(static function(BaseChunk $chunk) {
+                    if ($chunk instanceof CkEditorMarkup) {
+                        return $chunk->rawHtml;
+                    }
+                    return $chunk->getHtml();
+                })->join('');
+            } elseif ($value instanceof HtmlFieldData) {
+                $html = $value->getRawContent();
+            } else {
+                $html = (string)$value;
+            }
         } else {
             $html = (string)$value;
         }
-        if (!\preg_replace('/\s+/', '', $value)) {
+        if (empty($html) || !preg_replace('/\s+/', '', $value)) {
             return null;
         }
         return $html;
@@ -141,7 +154,7 @@ class RetconHelper
     public static function getTransformedImage(string $src, $transform, ?array $imagerTransformDefaults = null, ?array $imagerConfigOverrides = null): RetconTransformedImage|array|null
     {
 
-        // TODO: In Retcon 3.0, we should try to get the asset via RetconHelper::getAssetFromRef(), and transform that directly
+        // TODO: In Retcon 4.0, we should try to get the asset via RetconHelper::getAssetFromRef(), and transform that directly
         // I.e. via `$asset->getUrl($transform)` or by passing the asset to Imager
         $imageUrl = Craft::$app->getElements()->parseRefs($src);
 
