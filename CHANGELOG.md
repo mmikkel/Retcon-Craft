@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 3.2.1 - 2024-10-21
 ### Fixed 
 - Fixed an issue where the `retconAutoAlt` filter didn't work as intended [#71](https://github.com/mmikkel/Retcon-Craft/issues/71)
 - Fixed an issue where Retcon would convert UTF-8 non-breaking spaces to HTML entities, preventing filters like `retconRemoveEmpty` from working correctly in all cases [#70](https://github.com/mmikkel/Retcon-Craft/issues/70)
