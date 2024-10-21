@@ -1,5 +1,9 @@
 # Retcon Changelog
 
+## Unreleased 
+### Fixed 
+- Fixed an issue where Retcon would convert UTF-8 non-breaking spaces to HTML entities, preventing filters like `retconRemoveEmpty` from working correctly in all cases [#70](https://github.com/mmikkel/Retcon-Craft/issues/70)
+
 ## 2.8.1 - 2024-07-03
 ### Fixed
 - Fixed a PHP 7 compatibility issue introduced in Retcon 2.8.0, affecting Craft 3 installs using the `retconSrcset` or `retconTransform` filters. [#69](https://github.com/mmikkel/Retcon-Craft/issues/69)
