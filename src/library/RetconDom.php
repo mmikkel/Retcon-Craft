@@ -43,16 +43,16 @@ class RetconDom
      */
     public function __construct($html)
     {
-        $html = (string)$html;
-        $libxmlUseInternalErrors = \libxml_use_internal_errors(true);
-        $content = \mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset());
+        $html = str_replace("\xc2\xa0", ' ', (string)$html); // Make sure UTF-8 non-breaking spaces are replaced with regular spaces
+        $libxmlUseInternalErrors = libxml_use_internal_errors(true);
+        $content = mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset());
         $this->doc = new \DOMDocument();
         $this->doc->loadHTML("<html><retcon>$content</retcon></html>", LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $this->crawler = new Crawler($this->doc);
         $this->html5 = new HTML5([
             'encode_entities' => false,
         ]);
-        \libxml_use_internal_errors($libxmlUseInternalErrors);
+        libxml_use_internal_errors($libxmlUseInternalErrors);
     }
 
     /**
