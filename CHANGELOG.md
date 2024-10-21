@@ -1,6 +1,6 @@
 # Retcon Changelog
 
-## Unreleased 
+## 2.8.2 - 2024-10-21 
 ### Fixed 
 - Fixed an issue where Retcon would convert UTF-8 non-breaking spaces to HTML entities, preventing filters like `retconRemoveEmpty` from working correctly in all cases [#70](https://github.com/mmikkel/Retcon-Craft/issues/70)
 
