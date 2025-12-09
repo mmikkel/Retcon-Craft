@@ -43,7 +43,7 @@ class RetconDom
      */
     public function __construct($html)
     {
-        $html = str_replace("\xc2\xa0", ' ', (string)$html); // Make sure UTF-8 non-breaking spaces are replaced with regular spaces
+        $html = (string)$html; // Whatever it is, let's ensure it's a string
         $libxmlUseInternalErrors = libxml_use_internal_errors(true);
         $content = mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset());
         $this->doc = new \DOMDocument();

@@ -820,10 +820,13 @@ class RetconService extends Component
         }
 
         $excludedTagsQuery = '//' . implode('|//', $excludedTags);
+        $nbsp = "\u{00A0}";
+        $xpath = "//*[not(normalize-space(translate(., \"{$nbsp}\", ' ')))]";
 
-        $crawler->filterXPath('//*[not(normalize-space())]')->each(function (Crawler $crawler) use ($excludedTagsQuery) {
+        $crawler->filterXPath($xpath)->each(function (Crawler $crawler) use ($excludedTagsQuery) {
+            $node = $crawler->getNode(0);
             if (
-                ($node = $crawler->getNode(0)) === null ||
+                $node === null ||
                 !$node->parentNode instanceof \DOMNode ||
                 $crawler->filterXPath($excludedTagsQuery)->getNode(0) ||
                 @$crawler->closest('svg')
