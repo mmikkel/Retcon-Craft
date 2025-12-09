@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 3.2.2 - 2025-12-09
 ### Fixed 
 - Fixed a bug where Retcon would remove UTF-8 encoded `&nbsp;` entities in CKEditor field values. [#73](https://github.com/mmikkel/Retcon-Craft/issues/73) 
 
