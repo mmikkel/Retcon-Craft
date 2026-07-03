@@ -374,6 +374,9 @@ class RetconHelper
         /** @var RetconSettings $settings */
         $settings = Retcon::getInstance()->getSettings();
         $basePath = $settings->baseTransformPath;
+        if (!$basePath || !\is_string($basePath)) {
+            return null;
+        }
         $siteUrl = UrlHelper::siteUrl();
         $host = \parse_url($siteUrl, PHP_URL_HOST);
 
