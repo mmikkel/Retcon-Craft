@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Security
+- Hardened filesystem path handling in the native image transform pipeline.
+### Fixed
+- Fixed a bug where the `retconInject` filter would fail to inject non-well-formed HTML (e.g. unclosed void tags or bare entities), silently drop all but the first top-level node when injecting multiple sibling elements, and mangle plain text containing `&` or `<`.
+- Fixed a deprecation notice ("Handling HTML entities via mbstring is deprecated") emitted on every filter invocation under PHP 8.2+.
+
 ## 3.2.2 - 2025-12-09
 ### Fixed 
 - Fixed a bug where Retcon would remove UTF-8 encoded `&nbsp;` entities in CKEditor field values. [#73](https://github.com/mmikkel/Retcon-Craft/issues/73) 

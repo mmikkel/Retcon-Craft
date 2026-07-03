@@ -269,9 +269,18 @@ class RetconHelper
 
         // Exit if local file doesn't exist
         $isDevMode = YII_DEBUG;
-        $imagePath = static::fixSlashes($basePath . '/' . $imageUrlInfo['path']);
+        $imagePath = static::fixSlashes($basePath . '/' . ($imageUrlInfo['path'] ?? ''));
 
-        if (!\file_exists($imagePath)) {
+        // Resolve the path and ensure it stays within the base transform path. parse_url() does not
+        // normalize `../` segments, so without this an attacker-controlled `src` could escape the
+        // base path and have Retcon read from (and write transforms to) arbitrary filesystem locations.
+        $realBasePath = \realpath($basePath);
+        $realImagePath = \realpath($imagePath);
+        if (
+            $realBasePath === false ||
+            $realImagePath === false ||
+            ($realImagePath !== $realBasePath && !\str_starts_with($realImagePath, $realBasePath . DIRECTORY_SEPARATOR))
+        ) {
             if ($isDevMode) {
                 throw new Exception(Craft::t('retcon', 'Image {path} not found', [
                     'path' => $imagePath,
@@ -279,6 +288,8 @@ class RetconHelper
             }
             return null;
         }
+
+        $imagePath = $realImagePath;
 
         // We can haz folder?
         FileHelper::createDirectory($imageTransformedFolder);
@@ -377,9 +388,17 @@ class RetconHelper
             return null;
         }
 
-        $imageAbsolutePath = static::fixSlashes($basePath . '/' . $imagePath);
+        // Resolve the path and ensure it stays within the base transform path (see getTransformedImage()
+        // for why this guard is necessary – parse_url() leaves `../` segments intact).
+        $realBasePath = \realpath($basePath);
+        $imageAbsolutePath = \realpath(static::fixSlashes($basePath . '/' . $imagePath));
 
-        if (!\file_exists($imageAbsolutePath) || \is_dir($imageAbsolutePath)) {
+        if (
+            $realBasePath === false ||
+            $imageAbsolutePath === false ||
+            \is_dir($imageAbsolutePath) ||
+            ($imageAbsolutePath !== $realBasePath && !\str_starts_with($imageAbsolutePath, $realBasePath . DIRECTORY_SEPARATOR))
+        ) {
             return null;
         }
 

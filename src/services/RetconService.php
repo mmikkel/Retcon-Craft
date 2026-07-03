@@ -732,30 +732,46 @@ class RetconService extends Component
 
         $doc = $dom->getDoc();
 
-        // What are we trying to inject, exactly?
-        if (\preg_match("/<[^<]+>/", $toInject, $matches) != 0) {
-            // Injected content is HTML
-            $fragment = $doc->createDocumentFragment();
-            $fragment->appendXML($toInject);
-            $injectNode = $fragment->childNodes->item(0);
-        } else {
-            $textNode = $doc->createTextNode($toInject);
+        // Are we injecting HTML or plain text?
+        $isHtml = \preg_match("/<[^<]+>/", $toInject) !== 0;
+
+        // Pre-parse the nodes to inject. Note: the previous implementation used
+        // DOMDocumentFragment::appendXML(), which only accepts well-formed XML – real-world HTML
+        // (unclosed void tags like <br>, bare ampersands, named entities such as &nbsp;) made it fail
+        // silently, and only the first parsed node was ever used, dropping any sibling elements.
+        // Parsing through RetconDom uses the same forgiving HTML parser as the main input, and we
+        // import every top-level node.
+        $injectNodes = [];
+        if ($isHtml) {
+            foreach ((new RetconDom($toInject))->getBodyNodes() as $bodyNode) {
+                $injectNodes[] = $doc->importNode($bodyNode, true);
+            }
         }
 
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
 
-            if (!$overwrite) {
-                if (isset($injectNode)) {
-                    $node->appendChild($doc->importNode($injectNode->cloneNode(true), true));
-                } elseif (isset($textNode)) {
-                    $node->appendChild($textNode->cloneNode());
+            if ($isHtml && empty($injectNodes)) {
+                continue;
+            }
+
+            // Clear existing content when overwriting. We remove child nodes explicitly rather than
+            // assigning to $node->nodeValue, which parses entity references and mangles any text
+            // containing '&' or '<'.
+            if ($overwrite) {
+                while ($node->firstChild) {
+                    $node->removeChild($node->firstChild);
                 }
-            } elseif (isset($injectNode)) {
-                $node->nodeValue = "";
-                $node->appendChild($doc->importNode($injectNode->cloneNode(true), true));
-            } elseif ($toInject) {
-                $node->nodeValue = $toInject;
+            }
+
+            if ($isHtml) {
+                foreach ($injectNodes as $injectNode) {
+                    $node->appendChild($injectNode->cloneNode(true));
+                }
+            } else {
+                // createTextNode() treats the value as literal text (escaped on output), unlike a
+                // direct nodeValue assignment.
+                $node->appendChild($doc->createTextNode($toInject));
             }
 
         }

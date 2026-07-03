@@ -45,7 +45,11 @@ class RetconDom
     {
         $html = (string)$html; // Whatever it is, let's ensure it's a string
         $libxmlUseInternalErrors = libxml_use_internal_errors(true);
-        $content = mb_convert_encoding($html, 'HTML-ENTITIES', Craft::$app->getView()->getTwig()->getCharset());
+        // Convert all non-ASCII characters to numeric entities so they survive DOMDocument::loadHTML()
+        // (which otherwise assumes ISO-8859-1 and mangles multibyte content). mb_convert_encoding()'s
+        // 'HTML-ENTITIES' target is deprecated as of PHP 8.2; mb_encode_numericentity() is the replacement.
+        $charset = Craft::$app->getView()->getTwig()->getCharset();
+        $content = mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0x1FFFFF], $charset);
         $this->doc = new \DOMDocument();
         $this->doc->loadHTML("<html><retcon>$content</retcon></html>", LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $this->crawler = new Crawler($this->doc);
@@ -110,6 +114,21 @@ class RetconDom
     public function getDoc(): \DOMDocument
     {
         return $this->doc;
+    }
+
+    /**
+     * Returns the parsed top-level nodes of the input HTML (i.e. the children of the internal
+     * <retcon> wrapper node).
+     *
+     * @return \DOMNode[]
+     */
+    public function getBodyNodes(): array
+    {
+        $wrapper = $this->doc->documentElement->firstChild ?? null;
+        if (!$wrapper instanceof \DOMNode || $wrapper->nodeName !== 'retcon') {
+            return [];
+        }
+        return \iterator_to_array($wrapper->childNodes);
     }
 
     /**
