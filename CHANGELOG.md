@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 3.2.3 - 2026-07-03
 ### Security
 - Hardened filesystem path handling in the native image transform pipeline.
 ### Fixed
